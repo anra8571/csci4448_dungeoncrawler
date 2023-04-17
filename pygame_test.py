@@ -3,6 +3,7 @@
 # https://stackoverflow.com/questions/28005641/how-to-add-a-background-image-into-pygame: Adding background images
 # https://www.pygame.org/docs/ref/cursors.html: Cursors
 
+import item
 import pygame
 from pygame.locals import (
     RLEACCEL,
@@ -18,9 +19,9 @@ from pygame.locals import (
 import sys
 import os
 
-class Player(pygame.sprite.Sprite):
+class PlayerSprite(pygame.sprite.Sprite):
     def __init__(self):
-        super(Player, self).__init__()
+        super(PlayerSprite, self).__init__()
         char_path = os.path.join("graphics", "char1.png")
         self.surf = pygame.image.load(char_path).convert()
         self.surf.set_colorkey((0, 0, 0), RLEACCEL)
@@ -28,21 +29,48 @@ class Player(pygame.sprite.Sprite):
 
 MONSTER_IMAGES = ["monster1.png"]
 
-class Monster(pygame.sprite.Sprite):
+class MonsterSprite(pygame.sprite.Sprite):
     def __init__(self, image_name):
-        super(Monster, self).__init__()
+        super(MonsterSprite, self).__init__()
         char_path = os.path.join("graphics", image_name)
         self.surf = pygame.image.load(char_path).convert()
         self.surf.set_colorkey((0, 0, 0), RLEACCEL)
         self.rect = self.surf.get_rect()
 
-class Inventory(pygame.sprite.Sprite):
+class InventorySprite(pygame.sprite.Sprite):
     def __init__(self):
-        super(Inventory, self).__init__()
+        super(InventorySprite, self).__init__()
         char_path = os.path.join("graphics", "inventory.png")
         self.surf = pygame.image.load(char_path).convert()
         self.surf.set_colorkey((0, 0, 0), RLEACCEL)
         self.rect = self.surf.get_rect()
+
+class ChestSprite(pygame.sprite.Sprite):
+    def __init__(self, image_name):
+        super(ChestSprite, self).__init__()
+        char_path = os.path.join("graphics", image_name)
+        self.surf = pygame.image.load(char_path).convert()
+        self.surf.set_colorkey((0, 0, 0), RLEACCEL)
+        self.rect = self.surf.get_rect()
+    def open(self):
+        char_path = os.path.join("graphics", "chest_open.png")
+        self.surf = pygame.image.load(char_path).convert()
+        self.surf.set_colorkey((0, 0, 0), RLEACCEL)
+        self.rect = self.surf.get_rect()
+        acquired_item = item.pool.acquire()
+        return acquired_item
+
+class ArrowSprite(pygame.sprite.Sprite):
+    def __init__(self):
+        super(ArrowSprite, self).__init__()
+        char_path = os.path.join("graphics", "arrow.png")
+        self.surf = pygame.image.load(char_path).convert()
+        self.surf.set_colorkey((0, 0, 0), RLEACCEL)
+        self.rect = self.surf.get_rect()
+
+class Player():
+    def __init__(self):
+        self.inventory = []
 
 # Setup
 WIDTH = 500
@@ -52,23 +80,45 @@ screen = pygame.display.set_mode([WIDTH, HEIGHT])
 bg_path = os.path.join("graphics", "arena.png")
 bg_image = pygame.image.load(bg_path)
 smallfont = pygame.font.SysFont('Corbel', 16)
+show_inventory = False
 pygame.cursors.Cursor()
 
 # Instanciate starting objects
+player_sprite = PlayerSprite()
 player = Player()
-monster = Monster(MONSTER_IMAGES[0])
-inventory = Inventory()
-show_inventory = False
+monster = MonsterSprite(MONSTER_IMAGES[0])
+inventory = InventorySprite()
+chest = ChestSprite("closed_chest.png")
+chest_opened = False
+northArrow = ArrowSprite()
 
 run = True
 while run:
     # Draws the background and inventory buttons
     screen.blit(bg_image, (0, 0))
-    pygame.draw.rect(screen, (100, 100, 100), [375, 375, 90, 25])
+    pygame.draw.rect(screen, (100, 100, 100), [375, 450, 90, 25]) # Inventory
     text = smallfont.render("Inventory", True, (255, 255, 255))
-    screen.blit(text, (387, 380))
+    screen.blit(text, (389, 457))
+    pygame.draw.rect(screen, (100, 100, 100), [25, 450, 50, 25]) # Run away
+    text = smallfont.render("Run", True, (255, 255, 255))
+    screen.blit(text, (32, 457))
+    pygame.draw.rect(screen, (100, 100, 100), [100, 450, 90, 25]) # Use Item in fight
+    text = smallfont.render("Use Item", True, (255, 255, 255))
+    screen.blit(text, (117, 457))
+    pygame.draw.rect(screen, (100, 100, 100), [200, 450, 90, 25]) # Attack in fight
+    text = smallfont.render("Attack", True, (255, 255, 255))
+    screen.blit(text, (220, 457))
+
+    # pygame.draw.rect(screen, (100, 100, 100), [100, 450, 300, 25]) # Use Item in fight
+    # text = smallfont.render("Use Item", True, (255, 255, 255))
+    # screen.blit(text, (135, 457))
     if (show_inventory):
         screen.blit((inventory.surf), ((WIDTH)/8, HEIGHT/8))
+        continue
+    else:
+        screen.blit(player_sprite.surf, (WIDTH/4, HEIGHT/2))
+        screen.blit((chest.surf), ((3 * WIDTH)/4, HEIGHT/2))
+    screen.blit((northArrow.surf), (WIDTH/2, 20))
 
     # Gets the mouse position
     mouse = pygame.mouse.get_pos()
@@ -86,9 +136,15 @@ while run:
             # Clicked inventory exit
             if 420 <= mouse[0] <= 430 and 75 <= mouse[1] <= 95:
                 show_inventory = False
+            # Clicked chest
+            if ((3 * WIDTH)/4) <= mouse[0] < ((3 * WIDTH)/4) + 100 and HEIGHT/2 <= mouse[1] <= HEIGHT/2 + 100:
+                print("chest opened")
+                acquired_item = chest.open()
+                player.inventory.append(acquired_item)
+                print(f"Inventory: {player.inventory}")
     
-    screen.blit(player.surf, (WIDTH/4, HEIGHT/2))
-    screen.blit((monster.surf), ((3 * WIDTH)/4, HEIGHT/2))
+    # screen.blit(player.surf, (WIDTH/4, HEIGHT/2))
+    # screen.blit((chest.surf), ((3 * WIDTH)/4, HEIGHT/2))
 
     pygame.display.update()
 
