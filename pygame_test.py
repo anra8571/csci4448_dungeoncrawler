@@ -4,6 +4,7 @@
 # https://www.pygame.org/docs/ref/cursors.html: Cursors
 
 import item
+import room
 import pygame
 from pygame.locals import (
     RLEACCEL,
@@ -61,9 +62,16 @@ class ChestSprite(pygame.sprite.Sprite):
         return acquired_item
 
 class ArrowSprite(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, direction):
         super(ArrowSprite, self).__init__()
-        char_path = os.path.join("graphics", "arrow.png")
+        if direction == "North":
+            char_path = os.path.join("graphics", "arrow_up.png")
+        elif direction == "East":
+            char_path = os.path.join("graphics", "arrow_right.png")
+        elif direction == "South":
+            char_path = os.path.join("graphics", "arrow_down.png")
+        else:
+            char_path = os.path.join("graphics", "arrow_left.png")
         self.surf = pygame.image.load(char_path).convert()
         self.surf.set_colorkey((0, 0, 0), RLEACCEL)
         self.rect = self.surf.get_rect()
@@ -79,6 +87,8 @@ pygame.init()
 screen = pygame.display.set_mode([WIDTH, HEIGHT])
 bg_path = os.path.join("graphics", "arena.png")
 bg_image = pygame.image.load(bg_path)
+bg_monster_path = os.path.join("graphics", "bg_monster.png")
+bg_monster = pygame.image.load(bg_monster_path)
 smallfont = pygame.font.SysFont('Corbel', 16)
 show_inventory = False
 pygame.cursors.Cursor()
@@ -90,12 +100,21 @@ monster = MonsterSprite(MONSTER_IMAGES[0])
 inventory = InventorySprite()
 chest = ChestSprite("closed_chest.png")
 chest_opened = False
-northArrow = ArrowSprite()
+northArrow = ArrowSprite("North")
+eastArrow = ArrowSprite("East")
+southArrow = ArrowSprite("South")
+westArrow = ArrowSprite("West")
+
+map = {} # empty dictionary that will contain all the rooms - coordinate tuple is the key, room object value
+currentRoom = room.Room((0,0), "safe") # create initial room at (0,0) and it is a safe room
 
 run = True
 while run:
     # Draws the background and inventory buttons
-    screen.blit(bg_image, (0, 0))
+    if currentRoom.roomType == "safe":
+        screen.blit(bg_image, (0, 0)) # safe room background
+    else:
+        screen.blit(bg_monster, (0,0)) # monster background
     pygame.draw.rect(screen, (100, 100, 100), [375, 450, 90, 25]) # Inventory
     text = smallfont.render("Inventory", True, (255, 255, 255))
     screen.blit(text, (389, 457))
