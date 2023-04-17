@@ -5,6 +5,7 @@
 
 import item
 import room
+import chest
 import pygame
 from pygame.locals import (
     RLEACCEL,
@@ -46,21 +47,6 @@ class InventorySprite(pygame.sprite.Sprite):
         self.surf.set_colorkey((0, 0, 0), RLEACCEL)
         self.rect = self.surf.get_rect()
 
-class ChestSprite(pygame.sprite.Sprite):
-    def __init__(self, image_name):
-        super(ChestSprite, self).__init__()
-        char_path = os.path.join("graphics", image_name)
-        self.surf = pygame.image.load(char_path).convert()
-        self.surf.set_colorkey((0, 0, 0), RLEACCEL)
-        self.rect = self.surf.get_rect()
-    def open(self):
-        char_path = os.path.join("graphics", "chest_open.png")
-        self.surf = pygame.image.load(char_path).convert()
-        self.surf.set_colorkey((0, 0, 0), RLEACCEL)
-        self.rect = self.surf.get_rect()
-        acquired_item = item.pool.acquire()
-        return acquired_item
-
 class ArrowSprite(pygame.sprite.Sprite):
     def __init__(self, direction):
         super(ArrowSprite, self).__init__()
@@ -86,26 +72,49 @@ class Player():
     def __init__(self):
         self.inventory = []
 
+def PrintMap(map, currentRoom, screen):
+    pygame.draw.rect(screen, (0,0,0), [300, 40, 135, 135]) # mini-map backdrop
+    for i in range(5):
+        for j in range(5):
+            x = i - 2 # the room coordinates are centered on (0,0), top left is (-2,-2)
+            y = j - 2
+            if (x,y) in map: # if we have been to the room before and know its type
+                room = map[(x,y)]
+                if room.roomType == "safe" and room.chest.opened == False:
+                    color = (0, 50, 255) # blue-ish
+                elif room.roomType == "safe":
+                    color = (50, 50, 50) # brown-ish
+                else:
+                    color = (255, 50, 0) # red-ish
+            else:
+                color = (100,100,100) # grey-ish
+
+            pygame.draw.rect(screen, color, [300 + i*27, 40 + j*27, 25, 25]) # Inventory
+    text = smallfont.render("P", True, (255, 255, 255))
+    screen.blit(text, (362 + (currentRoom.x)*27, 99 + (currentRoom.y)*27))
+
+
 # Setup
 WIDTH = 500
 HEIGHT = 500
 pygame.init()
 screen = pygame.display.set_mode([WIDTH, HEIGHT])
-bg_path = os.path.join("graphics", "arena.png")
-bg_image = pygame.image.load(bg_path)
+bg_looted_path = os.path.join("graphics", "arena.png")
+bg_looted = pygame.image.load(bg_looted_path)
 bg_monster_path = os.path.join("graphics", "bg_monster.png")
 bg_monster = pygame.image.load(bg_monster_path)
+bg_safe_path = os.path.join("graphics", "bg_safe.png")
+bg_safe = pygame.image.load(bg_safe_path)
 smallfont = pygame.font.SysFont('Corbel', 16)
 show_inventory = False
-pygame.cursors.Cursor()
+# pygame.cursors.Cursor()
 
 # Instanciate starting objects
 player_sprite = PlayerSprite()
 player = Player()
 monster = MonsterSprite(MONSTER_IMAGES[0])
 inventory = InventorySprite()
-chest = ChestSprite("closed_chest.png")
-chest_opened = False
+
 northArrow = ArrowSprite("North")
 eastArrow = ArrowSprite("East")
 southArrow = ArrowSprite("South")
@@ -113,18 +122,25 @@ westArrow = ArrowSprite("West")
 
 map = {} # empty dictionary that will contain all the rooms - coordinate tuple is the key, room object value
 currentRoom = room.Room((0,0), "safe") # create initial room at (0,0) and it is a safe room
+map[(0,0)] = currentRoom
 
 numDefeated = 0 # number of enemies defeated
 
 run = True
 while run:
+
     # Draws the background and inventory buttons
-    if currentRoom.roomType == "safe":
-        screen.blit(bg_image, (0, 0)) # safe room background
-        screen.blit((chest.surf), ((3 * WIDTH)/4, HEIGHT/2))
+    if currentRoom.roomType == "safe" and currentRoom.chest.opened == False:
+        screen.blit(bg_safe, (0, 0)) # safe room background
+        screen.blit((currentRoom.chest.surf), ((3 * WIDTH)/4, HEIGHT/2))
+    elif currentRoom.roomType == "safe":
+        screen.blit(bg_looted, (0, 0)) # safe room background
+        screen.blit((currentRoom.chest.surf), ((3 * WIDTH)/4, HEIGHT/2))
     else:
         screen.blit(bg_monster, (0,0)) # monster background
         screen.blit((monster.surf), ((3 * WIDTH)/4, HEIGHT/2))
+
+    PrintMap(map, currentRoom, screen)
 
     pygame.draw.rect(screen, (100, 100, 100), [375, 450, 90, 25]) # Inventory
     text = smallfont.render("Inventory", True, (255, 255, 255))
@@ -138,20 +154,26 @@ while run:
     pygame.draw.rect(screen, (100, 100, 100), [200, 450, 90, 25]) # Attack in fight
     text = smallfont.render("Attack", True, (255, 255, 255))
     screen.blit(text, (220, 457))
+    
+    validMoves = [] # get valid moves so we put arrows in the right spots
 
-    # pygame.draw.rect(screen, (100, 100, 100), [100, 450, 300, 25]) # Use Item in fight
-    # text = smallfont.render("Use Item", True, (255, 255, 255))
-    # screen.blit(text, (135, 457))
+    if currentRoom.y > -2:
+        screen.blit((northArrow.surf), (225, 20)) 
+        validMoves.append("North")
+    if currentRoom.x < 2:
+        screen.blit((eastArrow.surf), (WIDTH - 75, HEIGHT/2 -50))
+        validMoves.append("East")
+    if currentRoom.y < 2:
+        screen.blit((southArrow.surf), (225, HEIGHT-100))
+        validMoves.append("South")
+    if currentRoom.x > -2:
+        screen.blit((westArrow.surf), (30, HEIGHT/2-50))
+        validMoves.append("West")
+
     if (show_inventory):
-        screen.blit((inventory.surf), ((WIDTH)/8, HEIGHT/8))
-        continue
+        screen.blit(inventory.surf, (WIDTH/8, HEIGHT/8))
     else:
         screen.blit(player_sprite.surf, (WIDTH/4, HEIGHT/2))
-    
-    screen.blit((northArrow.surf), (225, 20))
-    screen.blit((eastArrow.surf), (WIDTH - 75, HEIGHT/2 -50))
-    screen.blit((southArrow.surf), (225, HEIGHT-100))
-    screen.blit((westArrow.surf), (30, HEIGHT/2-50))
 
     # Gets the mouse position
     mouse = pygame.mouse.get_pos()
@@ -163,37 +185,44 @@ while run:
             run = False
         if event.type == MOUSEBUTTONDOWN:
             print(mouse)
-
-            # arrow
-            if 235 <= mouse[0] < 270 and 25 <= mouse[1] <= 70: # northArrow.rect.collidepoint(mouse)
-                ArrowSprite.Clicked(northArrow)
-                currentRoom = room.Room.SpawnRoom(map, currentRoom, (currentRoom.x, currentRoom.y), numDefeated, "north")
-            elif 430 <= mouse[0] < 475 and 205 <= mouse[1] <= 240:
-                ArrowSprite.Clicked(eastArrow)
-                currentRoom = room.Room.SpawnRoom(map, currentRoom, (currentRoom.x, currentRoom.y), numDefeated, "east")
-            elif 235 <= mouse[0] < 270 and 400 <= mouse[1] <= 445:
-                ArrowSprite.Clicked(southArrow)
-                currentRoom = room.Room.SpawnRoom(map, currentRoom, (currentRoom.x, currentRoom.y), numDefeated, "south")
-            elif 30 <= mouse[0] < 75 and 205 <= mouse[1] <= 240:
-                ArrowSprite.Clicked(westArrow)
-                currentRoom = room.Room.SpawnRoom(map, currentRoom, (currentRoom.x, currentRoom.y), numDefeated, "west")
-
+            if not show_inventory:
+                # clicking on arrow
+                if 235 <= mouse[0] < 270 and 25 <= mouse[1] <= 70 and "North" in validMoves: # northArrow.rect.collidepoint(mouse)
+                    ArrowSprite.Clicked(northArrow)
+                    currentRoom = room.Room.SpawnRoom(map, currentRoom, (currentRoom.x, currentRoom.y), numDefeated, "north")
+                    print("current room coordinates are (" + str(currentRoom.x) + "," + str(currentRoom.y) + ")")
+                elif 430 <= mouse[0] < 475 and 205 <= mouse[1] <= 240 and "East" in validMoves:
+                    ArrowSprite.Clicked(eastArrow)
+                    currentRoom = room.Room.SpawnRoom(map, currentRoom, (currentRoom.x, currentRoom.y), numDefeated, "east")
+                    print("current room coordinates are (" + str(currentRoom.x) + "," + str(currentRoom.y) + ")")
+                elif 235 <= mouse[0] < 270 and 400 <= mouse[1] <= 445 and "South" in validMoves:
+                    ArrowSprite.Clicked(southArrow)
+                    currentRoom = room.Room.SpawnRoom(map, currentRoom, (currentRoom.x, currentRoom.y), numDefeated, "south")
+                    print("current room coordinates are (" + str(currentRoom.x) + "," + str(currentRoom.y) + ")")
+                elif 30 <= mouse[0] < 75 and 205 <= mouse[1] <= 240 and "West" in validMoves:
+                    ArrowSprite.Clicked(westArrow)
+                    currentRoom = room.Room.SpawnRoom(map, currentRoom, (currentRoom.x, currentRoom.y), numDefeated, "west")
+                    print("current room coordinates are (" + str(currentRoom.x) + "," + str(currentRoom.y) + ")")
+                
+                # clicking on chest
+                if currentRoom.chest != None:
+                    # Clicked chest
+                    if ((3 * WIDTH)/4) <= mouse[0] < ((3 * WIDTH)/4) + 100 and HEIGHT/2 <= mouse[1] <= HEIGHT/2 + 100:
+                        print("clicked chest")
+                        acquired_item = currentRoom.chest.open()
+                        if acquired_item != None:
+                            player.inventory.append(acquired_item)
+                        print(f"Inventory: {player.inventory}")
+            
             # Clicked inventory button
-            if 375 <= mouse[0] <= 465 and 375 <= mouse[1] <= 400:
+            if 375 <= mouse[0] <= 465 and 450 <= mouse[1] <= 475:
+                print("clicked inventory")
                 show_inventory = True
             # Clicked inventory exit
             if 420 <= mouse[0] <= 430 and 75 <= mouse[1] <= 95:
                 show_inventory = False
-            # Clicked chest
-            if ((3 * WIDTH)/4) <= mouse[0] < ((3 * WIDTH)/4) + 100 and HEIGHT/2 <= mouse[1] <= HEIGHT/2 + 100:
-                print("chest opened")
-                acquired_item = chest.open()
-                player.inventory.append(acquired_item)
-                print(f"Inventory: {player.inventory}")
+            
     
-    # screen.blit(player.surf, (WIDTH/4, HEIGHT/2))
-    # screen.blit((chest.surf), ((3 * WIDTH)/4, HEIGHT/2))
-
     pygame.display.update()
 
 pygame.quit()
