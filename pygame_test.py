@@ -93,7 +93,6 @@ def PrintMap(map, currentRoom, screen):
     text = smallfont.render("P", True, (255, 255, 255))
     screen.blit(text, (362 + (currentRoom.x)*27, 99 + (currentRoom.y)*27))
 
-
 # Setup
 WIDTH = 500
 HEIGHT = 500
@@ -107,6 +106,7 @@ bg_safe_path = os.path.join("graphics", "bg_safe.png")
 bg_safe = pygame.image.load(bg_safe_path)
 smallfont = pygame.font.SysFont('Corbel', 16)
 show_inventory = False
+
 # pygame.cursors.Cursor()
 
 # Instanciate starting objects
@@ -154,7 +154,7 @@ while run:
     pygame.draw.rect(screen, (100, 100, 100), [200, 450, 90, 25]) # Attack in fight
     text = smallfont.render("Attack", True, (255, 255, 255))
     screen.blit(text, (220, 457))
-    
+
     validMoves = [] # get valid moves so we put arrows in the right spots
 
     if currentRoom.y > -2:
@@ -221,8 +221,7 @@ while run:
             # Clicked inventory exit
             if 420 <= mouse[0] <= 430 and 75 <= mouse[1] <= 95:
                 show_inventory = False
-            
-    
+
     pygame.display.update()
 
 pygame.quit()
