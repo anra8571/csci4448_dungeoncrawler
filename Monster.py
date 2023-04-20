@@ -28,11 +28,11 @@ class Monster():
     healing = 0
 
     def __init__(self, image_name, type):
-        super(Monster, self).__init__()
-        char_path = os.path.join("graphics", image_name)
-        self.surf = pygame.image.load(char_path).convert()
-        self.surf.set_colorkey((0, 0, 0), RLEACCEL)
-        self.rect = self.surf.get_rect()
+        # super(Monster, self).__init__()
+        # char_path = os.path.join("graphics", image_name)
+        # self.surf = pygame.image.load(char_path).convert()
+        # self.surf.set_colorkey((0, 0, 0), RLEACCEL)
+        # self.rect = self.surf.get_rect()
 
         if type=="Offensive":
             self.strat = Offensive()
