@@ -1,3 +1,10 @@
+
+from MonsterFactory import(
+    GoblinFactory,
+    CheesemanFactory
+)
+
+
 # Citations and Helpful Links
 # https://realpython.com/pygame-a-primer/: Setup, adding sprites
 # https://stackoverflow.com/questions/28005641/how-to-add-a-background-image-into-pygame: Adding background images
@@ -27,28 +34,28 @@ class Player(pygame.sprite.Sprite):
         self.surf.set_colorkey((0, 0, 0), RLEACCEL)
         self.rect = self.surf.get_rect()
 
-MONSTER_IMAGES = ["goblin.png"]
+# MONSTER_IMAGES = ["goblin.png"]
 
-class Monster(pygame.sprite.Sprite):
+# class Monster(pygame.sprite.Sprite):
     
 
-    def __init__(self, image_name):
-        super(Monster, self).__init__()
-        char_path = os.path.join("graphics", image_name)
-        self.surf = pygame.image.load(char_path).convert()
-        self.surf.set_colorkey((0, 0, 0), RLEACCEL)
-        self.rect = self.surf.get_rect()
+#     def __init__(self, image_name):
+#         super(Monster, self).__init__()
+#         char_path = os.path.join("graphics", image_name)
+#         self.surf = pygame.image.load(char_path).convert()
+#         self.surf.set_colorkey((0, 0, 0), RLEACCEL)
+#         self.rect = self.surf.get_rect()
 
-class chadBoss(Monster):
-    health = 40
-    name = "ChadBoss"
-    image = "monster1.png"
+# class chadBoss(Monster):
+#     health = 40
+#     name = "ChadBoss"
+#     image = "monster1.png"
 
-    def __init__(self):
-        char_path = os.path.join("graphics", self.image)
-        self.surf = pygame.image.load(char_path).convert()
-        self.surf.set_colorkey((0, 0, 0), RLEACCEL)
-        self.rect = self.surf.get_rect()
+#     def __init__(self):
+#         char_path = os.path.join("graphics", self.image)
+#         self.surf = pygame.image.load(char_path).convert()
+#         self.surf.set_colorkey((0, 0, 0), RLEACCEL)
+#         self.rect = self.surf.get_rect()
 
 
 
@@ -73,7 +80,10 @@ pygame.cursors.Cursor()
 
 # Instanciate starting objects
 player = Player()
-monster = Monster(MONSTER_IMAGES[0])
+goblinFactory = GoblinFactory()
+cheesemanFactory = CheesemanFactory()
+monster = cheesemanFactory.createCheeseman()
+# monster = Monster(MONSTER_IMAGES[0])
 inventory = Inventory()
 show_inventory = False
 
