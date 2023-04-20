@@ -79,6 +79,9 @@ class ArrowSprite(pygame.sprite.Sprite):
 class Player():
     def __init__(self):
         self.inventory = []
+        self.health = 15
+        self.damage = 15
+        self.defense = 9
 
 def PrintMap(map, currentRoom, screen):
     pygame.draw.rect(screen, (0,0,0), [300, 40, 135, 135]) # mini-map backdrop
@@ -114,6 +117,8 @@ bg_safe_path = os.path.join("graphics", "bg_safe.png")
 bg_safe = pygame.image.load(bg_safe_path)
 smallfont = pygame.font.SysFont('Corbel', 16)
 show_inventory = False
+monst_factory = MonsterFactory.MonsterFactory()
+monster = monst_factory.createMonster()
 
 # pygame.cursors.Cursor()
 
@@ -226,9 +231,21 @@ while run:
             if 375 <= mouse[0] <= 465 and 450 <= mouse[1] <= 475:
                 print("clicked inventory")
                 show_inventory = True
+
             # Clicked inventory exit
             if 420 <= mouse[0] <= 430 and 75 <= mouse[1] <= 95:
                 show_inventory = False
+
+            # Clicked Attack button
+            if 200 <= mouse[0] <= 290 and 450 <= mouse[1] <= 475:
+                currentRoom.monster.health -= player.damage - currentRoom.monster.defense
+                action = currentRoom.monster.pickAction()
+                print(f"Monster Action: {action}")
+                if action[0] == "attack":
+                    player.health -= action[1] - player.defense
+                elif action[0] == "defend":
+                    currentRoom.monster.health += action[1]
+                print(f"Attack: player health {player.health} and monster health {currentRoom.monster.health}")
 
     pygame.display.update()
 
