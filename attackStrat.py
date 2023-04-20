@@ -41,7 +41,7 @@ class Offensive(attackStrat):
 
     def getAttack(self):
         choice = random.uniform(0,1)
-        if choice < self.attacProb:
+        if choice < self.attackProb:
             return "attack"
         else:
             return "defend"
@@ -59,7 +59,7 @@ class Balanced(attackStrat):
 
     def getAttack(self):
         choice = random.uniform(0,1)
-        if choice < self.attacProb:
+        if choice < self.attackProb:
             return "attack"
         else:
             return "defend"

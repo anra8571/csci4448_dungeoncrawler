@@ -238,14 +238,16 @@ while run:
 
             # Clicked Attack button
             if 200 <= mouse[0] <= 290 and 450 <= mouse[1] <= 475:
-                currentRoom.monster.health -= player.damage - currentRoom.monster.defense
+                print(f"Attack: player health {player.health} and monster health {currentRoom.monster.health}")
+                currentRoom.monster.takeDamage(player.damage)
                 action = currentRoom.monster.pickAction()
                 print(f"Monster Action: {action}")
+                # TODO: player should not gain health if the defense is high
                 if action[0] == "attack":
                     player.health -= action[1] - player.defense
-                elif action[0] == "defend":
-                    currentRoom.monster.health += action[1]
-                print(f"Attack: player health {player.health} and monster health {currentRoom.monster.health}")
+                print(f"End Attack: player health {player.health} and monster health {currentRoom.monster.health}")
+                if (currentRoom.monster.checkAlive()):
+                    print("The monster has died")
 
     pygame.display.update()
 
