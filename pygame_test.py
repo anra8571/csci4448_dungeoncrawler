@@ -18,6 +18,7 @@ from pygame.locals import (
     QUIT,
     MOUSEBUTTONDOWN,
 )
+
 import sys
 import os
 
@@ -29,12 +30,23 @@ class PlayerSprite(pygame.sprite.Sprite):
         self.surf.set_colorkey((0, 0, 0), RLEACCEL)
         self.rect = self.surf.get_rect()
 
-MONSTER_IMAGES = ["monster1.png"]
+MONSTER_IMAGES = ["goblin.png"]
 
 class MonsterSprite(pygame.sprite.Sprite):
     def __init__(self, image_name):
         super(MonsterSprite, self).__init__()
         char_path = os.path.join("graphics", image_name)
+        self.surf = pygame.image.load(char_path).convert()
+        self.surf.set_colorkey((0, 0, 0), RLEACCEL)
+        self.rect = self.surf.get_rect()
+
+class chadBoss(Monster):
+    health = 40
+    name = "ChadBoss"
+    image = "monster1.png"
+
+    def __init__(self):
+        char_path = os.path.join("graphics", self.image)
         self.surf = pygame.image.load(char_path).convert()
         self.surf.set_colorkey((0, 0, 0), RLEACCEL)
         self.rect = self.surf.get_rect()
