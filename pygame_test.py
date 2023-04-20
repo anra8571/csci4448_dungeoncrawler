@@ -8,7 +8,7 @@ import room
 import chest
 import pygame
 import MonsterFactory
-import Monster
+
 
 from pygame.locals import (
     RLEACCEL,
