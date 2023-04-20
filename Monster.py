@@ -25,14 +25,14 @@ class Monster():
     health = 0
     damage = 0
     defense = 0
-
+    healing = 0
 
     def __init__(self, image_name, type):
-        super(Monster, self).__init__()
-        char_path = os.path.join("graphics", image_name)
-        self.surf = pygame.image.load(char_path).convert()
-        self.surf.set_colorkey((0, 0, 0), RLEACCEL)
-        self.rect = self.surf.get_rect()
+        # super(Monster, self).__init__()
+        # char_path = os.path.join("graphics", image_name)
+        # self.surf = pygame.image.load(char_path).convert()
+        # self.surf.set_colorkey((0, 0, 0), RLEACCEL)
+        # self.rect = self.surf.get_rect()
 
         if type=="Offensive":
             self.strat = Offensive()
@@ -51,8 +51,8 @@ class Monster():
             damage = self.attack()
             return ["attack", damage]
         elif choice == 'defend':
-            health = self.defend()
-            return ["defend", health]
+            self.health = self.defend()
+            return ["defend", self.health]
 
 
     def attack(self):
@@ -62,7 +62,7 @@ class Monster():
             return self.damage
 
     def defend(self):
-        return self.health*0.1
+        return self.health + self.healing
 
 
     def crit(self):
@@ -80,14 +80,22 @@ class Monster():
             return True
         else:
             return False
-        
+    
+    def getAttack(self):
+        return self.damage
+    
+    def takeDamage(self, damage):
+        if damage > self.defense:
+            self.health = self.health - damage + self.defense
+
 class Goblin(Monster):
     def __init__(self):
         self.image_name = "goblin.png"
         Monster.__init__(self, "goblin.png", "Offensive")
         self.health = 10
         self.damage = 5
-        self.defense = 9
+        self.defense = 2
+        self.healing = 1
 
 class Cheeseman(Monster):
     def __init__(self):
@@ -95,4 +103,5 @@ class Cheeseman(Monster):
         Monster.__init__(self, "funnyRockGuy.png", "Defensive")
         self.health = 20
         self.damage = 2
-        self.defense = 8
+        self.defense = 2
+        self.healing = 1

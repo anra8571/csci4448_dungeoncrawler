@@ -8,12 +8,12 @@ class MonsterFactory:
 
 class GoblinFactory:
 
-    def createGoblin(self):
+    def createMonster(self):
         bob = Goblin()
         return bob
 
 class CheesemanFactory:
 
-    def createCheeseman(self):
+    def createMonster(self):
         cheese = Cheeseman()
         return cheese

@@ -82,7 +82,7 @@ pygame.cursors.Cursor()
 player = Player()
 goblinFactory = GoblinFactory()
 cheesemanFactory = CheesemanFactory()
-monster = cheesemanFactory.createCheeseman()
+monster = cheesemanFactory.createMonster()
 # monster = Monster(MONSTER_IMAGES[0])
 inventory = Inventory()
 show_inventory = False
