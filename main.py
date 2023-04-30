@@ -122,6 +122,7 @@ monst_factory = MonsterFactory.MonsterFactory()
 monster = monst_factory.createMonster()
 pygame.mixer.music.load("My-Dark-Passenger.mp3")
 pygame.mixer.music.play()
+curr_music = 'safe'
 
 # pygame.cursors.Cursor()
 
@@ -144,6 +145,15 @@ numDefeated = 0 # number of enemies defeated
 
 run = True
 while run:
+    if curr_music != currentRoom.roomType:
+        if curr_music == 'safe':
+            pygame.mixer.music.load("Hitman.mp3")
+            pygame.mixer.music.play()
+            curr_music = 'monster'
+        else:
+            pygame.mixer.music.load("My-Dark-Passenger.mp3")
+            pygame.mixer.music.play()
+            curr_music = 'safe'
     # Draws the background and inventory buttons
     if currentRoom.roomType == "safe" and currentRoom.chest.opened == False:
         screen.blit(bg_safe, (0, 0)) # safe room background
