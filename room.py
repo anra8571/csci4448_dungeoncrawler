@@ -1,6 +1,7 @@
 import random
 import chest
 import MonsterFactory
+import pygame
 
 goblin_factory = MonsterFactory.GoblinFactory()
 cheeseman_factory = MonsterFactory.CheesemanFactory()
@@ -17,10 +18,14 @@ class Room():
                 self.roomType = "monster"
                 # self.monster = Monster()
                 print("Init monster for this room")
+                pygame.mixer.music.load("Hitman.mp3")
+                pygame.mixer.music.play()
             else: # 20% chance of safe room
                 self.roomType = "safe"
                 self.chest = chest.ChestSprite("closed_chest.png")
-                print("Init chest for this room")     
+                print("Init chest for this room")   
+                pygame.mixer.music.load("My-Dark-Passenger.mp3")
+                pygame.mixer.music.play()  
 
             num = random.randint(1, 2)
             if num == 1:
@@ -36,8 +41,12 @@ class Room():
 
             if roomType == "safe":
                 self.chest = chest.ChestSprite("closed_chest.png") # init chest for this room
+                pygame.mixer.music.load("My-Dark-Passenger.mp3")
+                pygame.mixer.music.play()
             if roomType == "boss":
                 print("boss room")
+                pygame.mixer.music.load("Hitman.mp3")
+                pygame.mixer.music.play()
                 # different background, and will lead to end of game
 
             self.x = coords[0] # pass in the x and y coordinates when initialized, based on player's location and which arrow is clicked

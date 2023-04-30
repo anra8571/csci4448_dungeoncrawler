@@ -2,8 +2,8 @@
 # https://realpython.com/pygame-a-primer/: Setup, adding sprites
 # https://stackoverflow.com/questions/28005641/how-to-add-a-background-image-into-pygame: Adding background images
 # https://www.pygame.org/docs/ref/cursors.html: Cursors
-# Music for normal rooms: Fluffing a Duck Kevin MacLeod (incompetech.com) Licensed under Creative Commons: By Attribution 3.0 License http://creativecommons.org/licenses/by/3.0/ Music promoted by https://www.chosic.com/free-music/all/ 
-
+# Music for battle rooms: Hitman by Kevin MacLeod | https://incompetech.com/ Music promoted by https://www.chosic.com/free-music/all/ Creative Commons CC BY 3.0 https://creativecommons.org/licenses/by/3.0/
+ # Music for normal and chest rooms: My Dark Passenger by Darren Curtis | https://www.darrencurtismusic.com/ Music promoted by https://www.chosic.com/free-music/all/ Creative Commons CC BY 3.0 https://creativecommons.org/licenses/by/3.0/
 import item
 import room
 import chest
@@ -120,7 +120,7 @@ smallfont = pygame.font.SysFont('Corbel', 16)
 show_inventory = False
 monst_factory = MonsterFactory.MonsterFactory()
 monster = monst_factory.createMonster()
-pygame.mixer.music.load("Fluffing-a-Duck.mp3")
+pygame.mixer.music.load("My-Dark-Passenger.mp3")
 pygame.mixer.music.play()
 
 # pygame.cursors.Cursor()
@@ -144,7 +144,6 @@ numDefeated = 0 # number of enemies defeated
 
 run = True
 while run:
-
     # Draws the background and inventory buttons
     if currentRoom.roomType == "safe" and currentRoom.chest.opened == False:
         screen.blit(bg_safe, (0, 0)) # safe room background
