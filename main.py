@@ -2,14 +2,15 @@
 # https://realpython.com/pygame-a-primer/: Setup, adding sprites
 # https://stackoverflow.com/questions/28005641/how-to-add-a-background-image-into-pygame: Adding background images
 # https://www.pygame.org/docs/ref/cursors.html: Cursors
-
+# Music for battle rooms: Hitman by Kevin MacLeod | https://incompetech.com/ Music promoted by https://www.chosic.com/free-music/all/ Creative Commons CC BY 3.0 https://creativecommons.org/licenses/by/3.0/
+ # Music for normal and chest rooms: My Dark Passenger by Darren Curtis | https://www.darrencurtismusic.com/ Music promoted by https://www.chosic.com/free-music/all/ Creative Commons CC BY 3.0 https://creativecommons.org/licenses/by/3.0/
 import item
 import room
 import chest
 import sprites
 import pygame
 import MonsterFactory
-
+import sys
 
 from pygame.locals import (
     RLEACCEL,
@@ -166,7 +167,15 @@ numDefeated = 0 # number of enemies defeated
 
 run = True
 while run:
-
+    if curr_music != currentRoom.roomType:
+        if curr_music == 'safe':
+            pygame.mixer.music.load("Hitman.mp3")
+            pygame.mixer.music.play()
+            curr_music = 'monster'
+        else:
+            pygame.mixer.music.load("My-Dark-Passenger.mp3")
+            pygame.mixer.music.play()
+            curr_music = 'safe'
     # Draws the background and inventory buttons
     if currentRoom.roomType == "safe" and currentRoom.chest.opened == False:
         screen.blit(bg_safe, (0, 0)) # safe room background
