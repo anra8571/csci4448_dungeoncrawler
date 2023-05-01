@@ -55,19 +55,16 @@ class Weapon(Item):
 class RustySword(Weapon):
     def __init__(self):
         super().__init__()
-        self.char_path = os.path.join("graphics", "stick.png")
         self.damage = random.randint(1, 2)
 
 class Axe(Weapon):
     def __init__(self):
         super().__init__()
-        self.char_path = os.path.join("graphics", "stick.png")
         self.damage = random.randint(2, 4)
 
 class Bow(Weapon):
     def __init__(self):
         super().__init__()
-        self.char_path = os.path.join("graphics", "stick.png")
         self.damage = random.randint(1, 3)
 
 class Pool:
