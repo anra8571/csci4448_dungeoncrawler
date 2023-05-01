@@ -7,6 +7,7 @@
 import item
 import room
 import chest
+import sprites
 import pygame
 import MonsterFactory
 import sys
@@ -26,63 +27,67 @@ from pygame.locals import (
 import sys
 import os
 
-class PlayerSprite(pygame.sprite.Sprite):
-    def __init__(self):
-        super(PlayerSprite, self).__init__()
-        char_path = os.path.join("graphics", "char1.png")
-        self.surf = pygame.image.load(char_path).convert()
-        self.surf.set_colorkey((0, 0, 0), RLEACCEL)
-        self.rect = self.surf.get_rect()
-
 MONSTER_IMAGES = ["goblin.png"]
+INVENTORY_WIDTH = 5
+INVENTORY_HEIGHT = 2
 
-
-class MonsterSprite(pygame.sprite.Sprite):
-
-    def __init__(self, image_name):
-        super(MonsterSprite, self).__init__()
-        char_path = os.path.join("graphics", image_name)
-        self.surf = pygame.image.load(char_path).convert()
-        self.surf.set_colorkey((0, 0, 0), RLEACCEL)
-        self.rect = self.surf.get_rect()
-
-
-class InventorySprite(pygame.sprite.Sprite):
-
-    def __init__(self):
-        super(InventorySprite, self).__init__()
-        char_path = os.path.join("graphics", "inventory.png")
-        self.surf = pygame.image.load(char_path).convert()
-        self.surf.set_colorkey((0, 0, 0), RLEACCEL)
-        self.rect = self.surf.get_rect()
-
-class ArrowSprite(pygame.sprite.Sprite):
-    def __init__(self, direction):
-        super(ArrowSprite, self).__init__()
-        self.direction = direction
-        if direction == "North":
-            char_path = os.path.join("graphics", "arrow_up.png")
-            #self.surf = pygame.image.load(char_path).convert()
-            #self.surf.set_colorkey((0, 0, 0), RLEACCEL)
-            #self.rect = self.surf.get_rect()
-        elif direction == "East":
-            char_path = os.path.join("graphics", "arrow_right.png")
-        elif direction == "South":
-            char_path = os.path.join("graphics", "arrow_down.png")
-        else:
-            char_path = os.path.join("graphics", "arrow_left.png")
-        self.surf = pygame.image.load(char_path).convert()
-        self.surf.set_colorkey((0, 0, 0), RLEACCEL)
-        self.rect = self.surf.get_rect()
-    def Clicked(self):
-        print("clicked the " + self.direction + " arrow")
-
+def get_item_type(curr_item):
+    if isinstance(curr_item, item.Healing):
+        return "healing"
+    elif isinstance(curr_item, item.DefenseBuff):
+        return "defense"
+    elif isinstance(curr_item, item.AttackBuff):
+        return "attack"
+    elif isinstance(curr_item, item.Axe):
+        return "axe"
+    elif isinstance(curr_item, item.RustySword):
+        return "sword"
+    elif isinstance(curr_item, item.Bow):
+        return "bow"
+    else:
+        return "none"
+    
+def return_sprite(curr_item):
+    if get_item_type(curr_item) == "healing":
+        return sprites.HealingSprite()
+    elif get_item_type(curr_item) == "defense":
+        return sprites.DefenseSprite()
+    elif get_item_type(curr_item) == "attack":
+        return sprites.AttackSprite()
+    elif get_item_type(curr_item) == "axe":
+        return sprites.AxeSprite()
+    elif get_item_type(curr_item) == "sword":
+        return sprites.RustySwordSprite()
+    elif get_item_type(curr_item) == "bow":
+        return sprites.BowSprite()
+    else:
+        return "none"
+    
 class Player():
     def __init__(self):
         self.inventory = []
+        self.sprites_list = []
+        for i in range(INVENTORY_HEIGHT):
+            self.inventory.append([])
+            self.sprites_list.append([])
+        for i in range(INVENTORY_HEIGHT):
+            for j in range(INVENTORY_WIDTH):
+                self.inventory[i].append(None)
+                self.sprites_list[i].append(None)
         self.health = 15
         self.damage = 15
         self.defense = 9
+
+    def add_inventory(self, item):
+        # Maximum of 10 items in inventory - otherwise, the first one is automatically overwritten
+        for i in range(INVENTORY_HEIGHT):
+            for j in range(INVENTORY_WIDTH):
+                if self.inventory[i][j] is None:
+                    self.inventory[i][j] = item
+                    self.sprites_list[i][j] = return_sprite(item)
+                    return
+        self.inventory[0][0] = item
+        self.sprites_list[0][0] = return_sprite(item)
 
 def PrintMap(map, currentRoom, screen):
     pygame.draw.rect(screen, (0,0,0), [300, 40, 135, 135]) # mini-map backdrop
@@ -105,6 +110,21 @@ def PrintMap(map, currentRoom, screen):
     text = smallfont.render("P", True, (255, 255, 255))
     screen.blit(text, (362 + (currentRoom.x)*27, 99 + (currentRoom.y)*27))
 
+def printInventory(screen, sprite, player):
+    pygame.draw.rect(screen, (100,100,100), [0, 0, 500, 500]) # background
+    screen.blit(sprites.XSprite().surf, (WIDTH/10 * 9, HEIGHT/40))
+
+    # Draws the inventory rectangles
+    for i in range(5):
+        for j in range(2):
+            color = (200, 200, 200)
+            pygame.draw.rect(screen, color, [50 + i*60, 50 + j*60, 50, 50])
+            if player.inventory[j][i] is not None:
+                screen.blit(player.sprites_list[j][i].surf, [50 + i*60, 50 + j*60, 50, 50])
+    screen.blit(player_sprite.surf, (WIDTH/10 * 8, HEIGHT/4))
+    text = smallfont.render(f"Health: {player.health}   Damage: {player.damage}   Defense: {player.defense}", True, (255, 255, 255))
+    screen.blit(text, (WIDTH/4, 200))
+
 # Setup
 WIDTH = 500
 HEIGHT = 500
@@ -117,9 +137,8 @@ bg_monster = pygame.image.load(bg_monster_path)
 bg_safe_path = os.path.join("graphics", "bg_safe.png")
 bg_safe = pygame.image.load(bg_safe_path)
 smallfont = pygame.font.SysFont('Corbel', 16)
+bigfont = pygame.font.SysFont('Corbel', 34)
 show_inventory = False
-monst_factory = MonsterFactory.MonsterFactory()
-monster = monst_factory.createMonster()
 pygame.mixer.music.load("My-Dark-Passenger.mp3")
 pygame.mixer.music.play()
 curr_music = 'safe'
@@ -127,15 +146,21 @@ curr_music = 'safe'
 # pygame.cursors.Cursor()
 
 # Instanciate starting objects
-player_sprite = PlayerSprite()
+player_sprite = sprites.PlayerSprite()
 player = Player()
-monster = MonsterSprite(MONSTER_IMAGES[0])
-inventory = InventorySprite()
+test_item = item.pool.acquire()
+test_item2 = item.pool.acquire()
+player.add_inventory(test_item)
+player.add_inventory(test_item2)
+print(player.inventory)
+print(player.sprites_list)
+monster = sprites.MonsterSprite(MONSTER_IMAGES[0])
+inventory = sprites.InventorySprite()
 
-northArrow = ArrowSprite("North")
-eastArrow = ArrowSprite("East")
-southArrow = ArrowSprite("South")
-westArrow = ArrowSprite("West")
+northArrow = sprites.ArrowSprite("North")
+eastArrow = sprites.ArrowSprite("East")
+southArrow = sprites.ArrowSprite("South")
+westArrow = sprites.ArrowSprite("West")
 
 map = {} # empty dictionary that will contain all the rooms - coordinate tuple is the key, room object value
 currentRoom = room.Room((0,0), "safe") # create initial room at (0,0) and it is a safe room
@@ -195,10 +220,10 @@ while run:
         screen.blit((westArrow.surf), (30, HEIGHT/2-50))
         validMoves.append("West")
 
+    screen.blit(player_sprite.surf, (WIDTH/4, HEIGHT/2))
+
     if (show_inventory):
-        screen.blit(inventory.surf, (WIDTH/8, HEIGHT/8))
-    else:
-        screen.blit(player_sprite.surf, (WIDTH/4, HEIGHT/2))
+        printInventory(screen, player_sprite, player)
 
     # Gets the mouse position
     mouse = pygame.mouse.get_pos()
@@ -210,22 +235,23 @@ while run:
             run = False
         if event.type == MOUSEBUTTONDOWN:
             print(mouse)
+            # If not in the inventory (so in the main game)
             if not show_inventory:
                 # clicking on arrow
                 if 235 <= mouse[0] < 270 and 25 <= mouse[1] <= 70 and "North" in validMoves: # northArrow.rect.collidepoint(mouse)
-                    ArrowSprite.Clicked(northArrow)
+                    sprites.ArrowSprite.Clicked(northArrow)
                     currentRoom = room.Room.SpawnRoom(map, currentRoom, (currentRoom.x, currentRoom.y), numDefeated, "north")
                     print("current room coordinates are (" + str(currentRoom.x) + "," + str(currentRoom.y) + ")")
                 elif 430 <= mouse[0] < 475 and 205 <= mouse[1] <= 240 and "East" in validMoves:
-                    ArrowSprite.Clicked(eastArrow)
+                    sprites.ArrowSprite.Clicked(eastArrow)
                     currentRoom = room.Room.SpawnRoom(map, currentRoom, (currentRoom.x, currentRoom.y), numDefeated, "east")
                     print("current room coordinates are (" + str(currentRoom.x) + "," + str(currentRoom.y) + ")")
                 elif 235 <= mouse[0] < 270 and 400 <= mouse[1] <= 445 and "South" in validMoves:
-                    ArrowSprite.Clicked(southArrow)
+                    sprites.ArrowSprite.Clicked(southArrow)
                     currentRoom = room.Room.SpawnRoom(map, currentRoom, (currentRoom.x, currentRoom.y), numDefeated, "south")
                     print("current room coordinates are (" + str(currentRoom.x) + "," + str(currentRoom.y) + ")")
                 elif 30 <= mouse[0] < 75 and 205 <= mouse[1] <= 240 and "West" in validMoves:
-                    ArrowSprite.Clicked(westArrow)
+                    sprites.ArrowSprite.Clicked(westArrow)
                     currentRoom = room.Room.SpawnRoom(map, currentRoom, (currentRoom.x, currentRoom.y), numDefeated, "west")
                     print("current room coordinates are (" + str(currentRoom.x) + "," + str(currentRoom.y) + ")")
                 
@@ -236,30 +262,17 @@ while run:
                         print("clicked chest")
                         acquired_item = currentRoom.chest.open()
                         if acquired_item != None:
-                            player.inventory.append(acquired_item)
+                            player.add_inventory(acquired_item)
                         print(f"Inventory: {player.inventory}")
-            
-            # Clicked inventory button
-            if 375 <= mouse[0] <= 465 and 450 <= mouse[1] <= 475:
-                print("clicked inventory")
-                show_inventory = True
-
-            # Clicked inventory exit
-            if 420 <= mouse[0] <= 430 and 75 <= mouse[1] <= 95:
-                show_inventory = False
-
-            # Clicked Attack button
-            if 200 <= mouse[0] <= 290 and 450 <= mouse[1] <= 475:
-                print(f"Attack: player health {player.health} and monster health {currentRoom.monster.health}")
-                currentRoom.monster.takeDamage(player.damage)
-                action = currentRoom.monster.pickAction()
-                print(f"Monster Action: {action}")
-                # TODO: player should not gain health if the defense is high
-                if action[0] == "attack":
-                    player.health -= action[1] - player.defense
-                print(f"End Attack: player health {player.health} and monster health {currentRoom.monster.health}")
-                if (currentRoom.monster.checkAlive()):
-                    print("The monster has died")
+                # Clicked inventory button
+                if 375 <= mouse[0] <= 465 and 450 <= mouse[1] <= 475:
+                    print("clicked inventory")
+                    show_inventory = True
+            # If currently in the inventory
+            else:
+                # Clicked the X button to exit inventory
+                if 456 <= mouse[0] <= 490 and 16 <= mouse[1] <= 53:
+                    show_inventory = False
 
     pygame.display.update()
 

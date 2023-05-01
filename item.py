@@ -1,10 +1,24 @@
 # https://sourcemaking.com/design_patterns/object_pool/python/1
 import random
+import os
+import pygame
+from pygame.locals import (
+    RLEACCEL,
+    K_UP,
+    K_DOWN,
+    K_LEFT,
+    K_RIGHT,
+    K_ESCAPE,
+    KEYDOWN,
+    QUIT,
+    MOUSEBUTTONDOWN,
+)
 
 POOL_SIZE = 10
 
 class Item():
     def __init__(self, in_attribute, in_effect = 3):
+        super(Item, self).__init__()
         self.attribute = in_attribute
         self.effect = in_effect
 
@@ -82,8 +96,9 @@ class Pool:
     def release(self, item):
         return self.objs.append(item)
     
+    def print_pool(self):
+        obj_array = pool.return_items()
+        for i in range(POOL_SIZE):
+            print(f"{i}: {obj_array[i]}, attribute {obj_array[i].attribute}, effect {obj_array[i].effect}")
+    
 pool = Pool(POOL_SIZE)
-obj_array = pool.return_items()
-
-for i in range(POOL_SIZE):
-    print(f"{i}: {obj_array[i]}, attribute {obj_array[i].attribute}, effect {obj_array[i].effect}")
