@@ -62,3 +62,7 @@ class Room():
                     return new_room
         return map[new_coord] # this exists in the map already
 
+    def DefeatedRoom(self):
+        self.roomType = "safe"
+        self.chest = chest.ChestSprite("closed_chest.png") # init chest for this room
+
