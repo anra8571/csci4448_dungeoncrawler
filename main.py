@@ -139,6 +139,9 @@ bg_safe = pygame.image.load(bg_safe_path)
 smallfont = pygame.font.SysFont('Corbel', 16)
 bigfont = pygame.font.SysFont('Corbel', 34)
 show_inventory = False
+pygame.mixer.music.load("My-Dark-Passenger.mp3")
+pygame.mixer.music.play()
+curr_music = 'safe'
 
 # pygame.cursors.Cursor()
 
