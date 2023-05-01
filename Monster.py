@@ -105,3 +105,12 @@ class Cheeseman(Monster):
         self.damage = 2
         self.defense = 2
         self.healing = 1
+
+class Boss(Monster):
+    def __init__(self):
+        self.image_name =  "MediumFinalBoss.png"
+        Monster.__init__(self, "MediumFinalBoss.png", "Balanced")
+        self.health = 40
+        self.damage = 6
+        self.defense = 5
+        self.healing = 3
