@@ -1,5 +1,9 @@
 import random
 import chest
+import MonsterFactory
+
+goblin_factory = MonsterFactory.GoblinFactory()
+cheeseman_factory = MonsterFactory.CheesemanFactory()
 
 class Room():
 
@@ -16,7 +20,13 @@ class Room():
             else: # 20% chance of safe room
                 self.roomType = "safe"
                 self.chest = chest.ChestSprite("closed_chest.png")
-                print("Init chest for this room")                
+                print("Init chest for this room")     
+
+            num = random.randint(1, 2)
+            if num == 1:
+                self.monster = goblin_factory.createMonster()     
+            else:
+                self.monster = cheeseman_factory.createMonster()
 
             self.x = coords[0] # pass in the x and y coordinates when initialized, based on player's location and which arrow is clicked
             self.y = coords[1]
