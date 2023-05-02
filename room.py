@@ -5,6 +5,9 @@ import pygame
 
 goblin_factory = MonsterFactory.GoblinFactory()
 cheeseman_factory = MonsterFactory.CheesemanFactory()
+slime_factory = MonsterFactory.SlimeFactory()
+boss_factory = MonsterFactory.BossFactory()
+monkey_factory = MonsterFactory.MonkeyFactory()
 
 class Room():
 
@@ -27,12 +30,17 @@ class Room():
                 pygame.mixer.music.load("My-Dark-Passenger.mp3")
                 pygame.mixer.music.play()  
 
-            num = random.randint(1, 2)
+            num = random.randint(1, 4)
             if num == 1:
                 self.monster = goblin_factory.createMonster()     
-            else:
+            elif num == 2:
                 self.monster = cheeseman_factory.createMonster()
-
+            elif num == 3:
+                self.monster = slime_factory.createMonster()
+            else:
+                print("Chose monkey")
+                self.monster = monkey_factory.createMonster()
+            
             self.x = coords[0] # pass in the x and y coordinates when initialized, based on player's location and which arrow is clicked
             self.y = coords[1]
         else: # if we need to specifically define the saferoom or boss room
@@ -47,6 +55,7 @@ class Room():
                 print("boss room")
                 pygame.mixer.music.load("Hitman.mp3")
                 pygame.mixer.music.play()
+                self.monster = boss_factory.createMonster()
                 # different background, and will lead to end of game
 
             self.x = coords[0] # pass in the x and y coordinates when initialized, based on player's location and which arrow is clicked
@@ -70,7 +79,8 @@ class Room():
                 if numDefeated == 3:
                     print("spawn boss")
                     #Currently doesn't spawn a boss, but will need to change 
-                    new_room = Room(new_coord, "random")
+                    #new_room = Room(new_coord, "random")
+                    new_room = Room(new_coord, "boss")
                     map[new_coord] = new_room # add to map
                     return new_room
                 else:

@@ -28,7 +28,7 @@ from pygame.locals import (
 import sys
 import os
 
-MONSTER_IMAGES = ["goblin.png"]
+MONSTER_IMAGES = ["goblin.png", "funnyRockGuy.png"]
 INVENTORY_WIDTH = 5
 INVENTORY_HEIGHT = 2
 
@@ -130,7 +130,7 @@ def printInventory(screen, sprite, player):
     text = smallfont.render(f"Health: {player.health}   Damage: {player.damage}   Defense: {player.defense}", True, (255, 255, 255))
     screen.blit(text, (WIDTH/4, 200))
 
-# Setup
+
 WIDTH = 500
 HEIGHT = 500
 pygame.init()
@@ -141,6 +141,8 @@ bg_monster_path = os.path.join("graphics", "bg_monster.png")
 bg_monster = pygame.image.load(bg_monster_path)
 bg_safe_path = os.path.join("graphics", "bg_safe.png")
 bg_safe = pygame.image.load(bg_safe_path)
+bg_boss_path = os.path.join("graphics", "bossBackground.png")
+bg_boss = pygame.image.load(bg_boss_path)
 smallfont = pygame.font.SysFont('Corbel', 16)
 bigfont = pygame.font.SysFont('Corbel', 34)
 show_inventory = False
@@ -198,8 +200,11 @@ while run:
         text = smallfont.render("Inventory", True, (255, 255, 255))
         screen.blit(text, (224, 457))
     else:
-        screen.blit(bg_monster, (0,0)) # monster background
-        screen.blit((monster.surf), ((3 * WIDTH)/4, HEIGHT/2))
+        if currentRoom.roomType == "boss":
+            screen.blit(bg_boss, (0,0)) # monster background
+        else:
+            screen.blit(bg_monster, (0,0)) # monster background
+        screen.blit((currentRoom.monster.image.surf), ((3 * WIDTH)/4, HEIGHT/2))
         pygame.draw.rect(screen, (100, 100, 100), [25, 450, 50, 25]) # Run away
         text = smallfont.render("Run", True, (255, 255, 255))
         screen.blit(text, (32, 457))

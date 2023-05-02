@@ -2,6 +2,7 @@ import sys
 import os
 import random
 import pygame
+import sprites
 
 from attackStrat import (
     Balanced,
@@ -97,6 +98,7 @@ class Monster():
 class Goblin(Monster):
     def __init__(self):
         self.image_name = "goblin.png"
+        self.image = sprites.MonsterSprite(self.image_name)
         Monster.__init__(self, "goblin.png", "Offensive")
         self.health = 10
         self.damage = 5
@@ -107,16 +109,42 @@ class Goblin(Monster):
 class Cheeseman(Monster):
     def __init__(self):
         self.image_name =  "funnyRockGuy.png"
+        self.image = sprites.MonsterSprite(self.image_name)
         Monster.__init__(self, "funnyRockGuy.png", "Defensive")
         self.health = 20
         self.damage = 2
         self.defense = 2
         self.healing = 1
 
+
+class Slime(Monster):
+    def __init__(self):
+        print("Creating sliem")
+        self.image_name =  "redSlime.png"
+        self.image = sprites.MonsterSprite(self.image_name)
+        Monster.__init__(self, "redSlime.png", "Defensive")
+        self.health = 20
+        self.damage = 3
+        self.defense = 2
+        self.healing = 3
+
+
+class Monkey(Monster):
+    def __init__(self):
+        print("Creating monkey")
+        self.image_name =  "monkey.png"
+        self.image = sprites.MonsterSprite(self.image_name)
+        Monster.__init__(self, "monkey.png", "Offensive")
+        self.health = 15
+        self.damage = 7
+        self.defense = 1
+        self.healing = 2
+
 #Cool chad boss guy
 class Boss(Monster):
     def __init__(self):
-        self.image_name =  "MediumFinalBoss.png"
+        self.image_name =  "SmallerFinalBoss.png"
+        self.image = sprites.MonsterSprite(self.image_name)
         Monster.__init__(self, "MediumFinalBoss.png", "Balanced")
         self.health = 40
         self.damage = 6
