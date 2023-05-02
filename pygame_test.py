@@ -266,7 +266,7 @@ while run:
                     currentRoom.monster.takeDamage(player.damage)
                     if (currentRoom.monster.checkAlive()):
                         print("The monster has died")
-                        #currentRoom.DefeatedRoom()
+                        currentRoom.DefeatedRoom()
                         numDefeated += 1
                     else:
                         action = currentRoom.monster.pickAction()

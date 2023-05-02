@@ -53,13 +53,23 @@ class Room():
             new_coord = (coord[0], coord[1]+1)
         else: # west
             new_coord = (coord[0]-1, coord[1])
+        print(map)
+        print("The new coordinate is ", new_coord)
         if new_coord not in map: # generate room
+                print("Generating room. The cooridnates were not in the game")
+                
                 if numDefeated == 3:
                     print("spawn boss")
+                    #Currently doesn't spawn a boss, but will need to change 
+                    new_room = Room(new_coord, "random")
+                    map[new_coord] = new_room # add to map
+                    return new_room
                 else:
                     new_room = Room(new_coord, "random")
                     map[new_coord] = new_room # add to map
                     return new_room
+        if new_coord in map:
+            print("room has been added")
         return map[new_coord] # this exists in the map already
 
     def DefeatedRoom(self):
