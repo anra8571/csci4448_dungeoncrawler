@@ -10,6 +10,7 @@ import chest
 import sprites
 import pygame
 import MonsterFactory
+import random
 import sys
 
 from pygame.locals import (
@@ -78,6 +79,10 @@ class Player():
         self.damage = 15
         self.defense = 9
 
+    def checkPlayerAlive(self):
+        if self.health <= 0:
+            return False
+        return True
     def add_inventory(self, item):
         # Maximum of 10 items in inventory - otherwise, the first one is automatically overwritten
         for i in range(INVENTORY_HEIGHT):
@@ -183,27 +188,35 @@ while run:
     if currentRoom.roomType == "safe" and currentRoom.chest.opened == False:
         screen.blit(bg_safe, (0, 0)) # safe room background
         screen.blit((currentRoom.chest.surf), ((3 * WIDTH)/4, HEIGHT/2))
+        pygame.draw.rect(screen, (100, 100, 100), [210, 450, 90, 25]) # Inventory
+        text = smallfont.render("Inventory", True, (255, 255, 255))
+        screen.blit(text, (224, 457))
     elif currentRoom.roomType == "safe":
         screen.blit(bg_looted, (0, 0)) # safe room background
         screen.blit((currentRoom.chest.surf), ((3 * WIDTH)/4, HEIGHT/2))
+        pygame.draw.rect(screen, (100, 100, 100), [210, 450, 90, 25]) # Inventory
+        text = smallfont.render("Inventory", True, (255, 255, 255))
+        screen.blit(text, (224, 457))
     else:
         screen.blit(bg_monster, (0,0)) # monster background
         screen.blit((monster.surf), ((3 * WIDTH)/4, HEIGHT/2))
+        pygame.draw.rect(screen, (100, 100, 100), [25, 450, 50, 25]) # Run away
+        text = smallfont.render("Run", True, (255, 255, 255))
+        screen.blit(text, (32, 457))
+        pygame.draw.rect(screen, (100, 100, 100), [200, 450, 90, 25]) # Attack in fight
+        text = smallfont.render("Attack", True, (255, 255, 255))
+        screen.blit(text, (220, 457))
+        pygame.draw.rect(screen, (100, 100, 100), [100, 450, 90, 25]) # Use Item in fight
+        text = smallfont.render("Use Item", True, (255, 255, 255))
+        screen.blit(text, (117, 457))
+        pygame.draw.rect(screen, (100, 100, 100), [375, 450, 90, 25]) # Inventory
+        text = smallfont.render("Inventory", True, (255, 255, 255))
+        screen.blit(text, (389, 457))
 
     PrintMap(map, currentRoom, screen)
 
-    pygame.draw.rect(screen, (100, 100, 100), [375, 450, 90, 25]) # Inventory
-    text = smallfont.render("Inventory", True, (255, 255, 255))
-    screen.blit(text, (389, 457))
-    pygame.draw.rect(screen, (100, 100, 100), [25, 450, 50, 25]) # Run away
-    text = smallfont.render("Run", True, (255, 255, 255))
-    screen.blit(text, (32, 457))
-    pygame.draw.rect(screen, (100, 100, 100), [100, 450, 90, 25]) # Use Item in fight
-    text = smallfont.render("Use Item", True, (255, 255, 255))
-    screen.blit(text, (117, 457))
-    pygame.draw.rect(screen, (100, 100, 100), [200, 450, 90, 25]) # Attack in fight
-    text = smallfont.render("Attack", True, (255, 255, 255))
-    screen.blit(text, (220, 457))
+
+
 
     validMoves = [] # get valid moves so we put arrows in the right spots
 
@@ -235,8 +248,7 @@ while run:
             run = False
         if event.type == MOUSEBUTTONDOWN:
             print(mouse)
-            # If not in the inventory (so in the main game)
-            if not show_inventory:
+            if (not show_inventory) and (currentRoom.roomType == "safe"):
                 # clicking on arrow
                 if 235 <= mouse[0] < 270 and 25 <= mouse[1] <= 70 and "North" in validMoves: # northArrow.rect.collidepoint(mouse)
                     sprites.ArrowSprite.Clicked(northArrow)
@@ -264,15 +276,86 @@ while run:
                         if acquired_item != None:
                             player.add_inventory(acquired_item)
                         print(f"Inventory: {player.inventory}")
+            
+            if currentRoom.roomType == "safe":
+                # Clicked inventory button
+                if 210 <= mouse[0] <= 290 and 450 <= mouse[1] <= 475:
+                    print("clicked inventory")
+                    show_inventory = True
+
+                # Clicked inventory exit
+                if 456 <= mouse[0] <= 490 and 16 <= mouse[1] <= 53:
+                    show_inventory = False
+            else:
                 # Clicked inventory button
                 if 375 <= mouse[0] <= 465 and 450 <= mouse[1] <= 475:
                     print("clicked inventory")
                     show_inventory = True
-            # If currently in the inventory
-            else:
-                # Clicked the X button to exit inventory
+
+                # Clicked inventory exit
                 if 456 <= mouse[0] <= 490 and 16 <= mouse[1] <= 53:
                     show_inventory = False
+
+                # Clicked Attack button
+                if 200 <= mouse[0] <= 290 and 450 <= mouse[1] <= 475:
+                    print(f"Attack: player health {player.health} and monster health {currentRoom.monster.health}")
+                    currentRoom.monster.takeDamage(player.damage)
+                    if (currentRoom.monster.checkAlive()):
+                        print("The monster has died")
+                        currentRoom.DefeatedRoom()
+                        numDefeated += 1
+                    else:
+                        action = currentRoom.monster.pickAction()
+                        print(f"Monster Action: {action}")
+                        if action[0] == "attack":
+                            if action[1] > player.defense:
+                                player.health -= action[1] - player.defense
+                        print(f"End Attack: player health {player.health} and monster health {currentRoom.monster.health}")
+                    
+                        
+
+
+                #Clicked the run away button
+                if 25 <= mouse[0] <= 115 and 450 <= mouse[1] <= 475:
+                    print("Tried to run away")
+                    chance = random.random()
+                    print(chance)
+                    if chance < 0.3:
+                        print("run away successfully")
+                        #TODO lose an item in inventory
+                        newRoom = random.choice(validMoves)
+                        print(newRoom)
+                        if newRoom == "North": # northArrow.rect.collidepoint(mouse)
+                            sprites.ArrowSprite.Clicked(northArrow)
+                            currentRoom = room.Room.SpawnRoom(map, currentRoom, (currentRoom.x, currentRoom.y), numDefeated, "north")
+                            print("current room coordinates are (" + str(currentRoom.x) + "," + str(currentRoom.y) + ")")
+                        elif newRoom == "East":
+                            sprites.ArrowSprite.Clicked(eastArrow)
+                            currentRoom = room.Room.SpawnRoom(map, currentRoom, (currentRoom.x, currentRoom.y), numDefeated, "east")
+                            print("current room coordinates are (" + str(currentRoom.x) + "," + str(currentRoom.y) + ")")
+                        elif newRoom == "South":
+                            sprites.ArrowSprite.Clicked(southArrow)
+                            currentRoom = room.Room.SpawnRoom(map, currentRoom, (currentRoom.x, currentRoom.y), numDefeated, "south")
+                            print("current room coordinates are (" + str(currentRoom.x) + "," + str(currentRoom.y) + ")")
+                        elif newRoom == "West":
+                            sprites.ArrowSprite.Clicked(westArrow)
+                            currentRoom = room.Room.SpawnRoom(map, currentRoom, (currentRoom.x, currentRoom.y), numDefeated, "west")
+                            print("current room coordinates are (" + str(currentRoom.x) + "," + str(currentRoom.y) + ")")
+                                
+                    else:
+                        print("Did not run away")
+                        action = currentRoom.monster.pickAction()
+                        print(f"Monster Action: {action}")
+                        if action[0] == "attack":
+                            if action[1] > player.defense:
+                                player.health -= action[1] - player.defense
+                            if player.checkPlayerAlive() == False:
+                                print("Player has died")
+                        print(f"End Attack: player health {player.health} and monster health {currentRoom.monster.health}")
+
+                if 100 <= mouse[0] <= 190 and 450 <= mouse[1] <= 475:
+                    print("Use item")
+
 
     pygame.display.update()
 

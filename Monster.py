@@ -44,27 +44,29 @@ class Monster():
             print("Please give a correct type")
         print(self.image_name)
             
-
+    #When it is the monster's turn, call this function and it will decide what it does
     def pickAction(self):
+        #The strategy will return a option
         choice = self.strat.getAttack()
+        #if it is attacking
         if choice == "attack":
             damage = self.attack()
             return ["attack", damage]
         elif choice == 'defend':
-            self.health = self.defend()
             return ["defend", self.health]
 
-
+    #Will return the damage done by the monster
     def attack(self):
         if self.crit():
             return self.damage * 1.5
         else:
             return self.damage
 
+    #If the monster chose to defend itself, it will heal
     def defend(self):
-        return self.health + self.healing
+        self.health + self.healing
 
-
+    #Gets the chance of a critical hit and returns whether or not it was
     def crit(self):
         choice = self.strat.getCrit()
         if choice:
@@ -72,18 +74,22 @@ class Monster():
         else:
             return False
         
+    #Debugging purposes
     def printStats(self):
         print(self.health, self.damage, self.defense)
 
+    #Checks to see if the monster is alove
     def checkAlive(self):
         if self.health <= 0:
             return True
         else:
             return False
     
+    #For debugging purposes
     def getAttack(self):
         return self.damage
     
+    #Call this function when the player does damage. It will take the damage given
     def takeDamage(self, damage):
         if damage > self.defense:
             self.health = self.health - damage + self.defense
@@ -97,6 +103,7 @@ class Goblin(Monster):
         self.defense = 2
         self.healing = 1
 
+#Cheeseman my beloved
 class Cheeseman(Monster):
     def __init__(self):
         self.image_name =  "funnyRockGuy.png"
@@ -106,6 +113,7 @@ class Cheeseman(Monster):
         self.defense = 2
         self.healing = 1
 
+#Cool chad boss guy
 class Boss(Monster):
     def __init__(self):
         self.image_name =  "MediumFinalBoss.png"
