@@ -8,6 +8,7 @@ import item
 import room
 import chest
 import sprites
+import eventManager
 import pygame
 import MonsterFactory
 import random
@@ -148,8 +149,6 @@ pygame.mixer.music.load("My-Dark-Passenger.mp3")
 pygame.mixer.music.play()
 curr_music = 'safe'
 
-# pygame.cursors.Cursor()
-
 # Instanciate starting objects
 player_sprite = sprites.PlayerSprite()
 player = Player()
@@ -161,6 +160,11 @@ print(player.inventory)
 print(player.sprites_list)
 monster = sprites.MonsterSprite(MONSTER_IMAGES[0])
 inventory = sprites.InventorySprite()
+
+# Observer Pattern
+events = eventManager.ConcreteEventManager()
+logger = eventManager.Logger()
+events.registerObserver(logger)
 
 northArrow = sprites.ArrowSprite("North")
 eastArrow = sprites.ArrowSprite("East")
@@ -214,9 +218,6 @@ while run:
         screen.blit(text, (389, 457))
 
     PrintMap(map, currentRoom, screen)
-
-
-
 
     validMoves = [] # get valid moves so we put arrows in the right spots
 
@@ -275,6 +276,7 @@ while run:
                         acquired_item = currentRoom.chest.open()
                         if acquired_item != None:
                             player.add_inventory(acquired_item)
+                            events.acquireItem()
                         print(f"Inventory: {player.inventory}")
             
             if currentRoom.roomType == "safe":
@@ -311,9 +313,6 @@ while run:
                             if action[1] > player.defense:
                                 player.health -= action[1] - player.defense
                         print(f"End Attack: player health {player.health} and monster health {currentRoom.monster.health}")
-                    
-                        
-
 
                 #Clicked the run away button
                 if 25 <= mouse[0] <= 115 and 450 <= mouse[1] <= 475:
@@ -355,7 +354,6 @@ while run:
 
                 if 100 <= mouse[0] <= 190 and 450 <= mouse[1] <= 475:
                     print("Use item")
-
 
     pygame.display.update()
 
