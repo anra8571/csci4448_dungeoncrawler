@@ -22,6 +22,7 @@ class ChestSprite(pygame.sprite.Sprite):
         self.surf.set_colorkey((0, 0, 0), RLEACCEL)
         self.rect = self.surf.get_rect()
         self.opened = False
+        
     def open(self):
         if not self.opened: # can only loot once
             self.opened = True
