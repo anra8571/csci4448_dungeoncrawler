@@ -77,7 +77,7 @@ class Player():
                 self.sprites_list[i].append(None)
         self.health = 15
         self.damage = 15
-        self.defense = 9
+        self.defense = 15
 
     def checkPlayerAlive(self):
         if self.health <= 0:
@@ -147,6 +147,8 @@ bg_tempW_path = os.path.join("graphics", "tempWinBackground.png")
 bg_tempW = pygame.image.load(bg_tempW_path)
 bg_tempStart_path = os.path.join("graphics", "tempStart.png")
 bg_tempStart = pygame.image.load(bg_tempStart_path)
+bg_death_path = os.path.join("graphics", "tempDeath.png")
+bg_death = pygame.image.load(bg_death_path)
 smallfont = pygame.font.SysFont('Corbel', 16)
 bigfont = pygame.font.SysFont('Corbel', 34)
 show_inventory = False
@@ -155,6 +157,8 @@ pygame.mixer.music.play()
 curr_music = 'safe'
 gameOver = False
 gameStart = True
+instructions = False
+playerDead = False
 
 # pygame.cursors.Cursor()
 
@@ -183,7 +187,7 @@ numDefeated = 0 # number of enemies defeated
 
 run = True
 while run:
-    if gameStart:
+    if gameStart and not instructions:
         screen.blit(bg_tempStart, (0, 0))
         pygame.draw.rect(screen, (100, 100, 100), [210, 450, 90, 25]) # Inventory
         text = smallfont.render("Start Game", True, (255, 255, 255))
@@ -196,14 +200,22 @@ while run:
                 if 210 <= mouse[0] <= 290 and 450 <= mouse[1] <= 475:
                         print("clicked inventory")
                         gameStart = False
-    
+
     elif gameOver:
-        screen.blit(bg_tempW, (0, 0))
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
-            if event.type == MOUSEBUTTONDOWN:
-                print(mouse)
+        if playerDead:
+            screen.blit(bg_death, (0, 0))
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    run = False
+                if event.type == MOUSEBUTTONDOWN:
+                    print(mouse)
+        else:
+            screen.blit(bg_tempW, (0, 0))
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    run = False
+                if event.type == MOUSEBUTTONDOWN:
+                    print(mouse)
     else:
         if curr_music != currentRoom.roomType:
             if curr_music == 'safe':
@@ -350,7 +362,9 @@ while run:
                                 if action[1] > player.defense:
                                     player.health -= action[1] - player.defense
                             print(f"End Attack: player health {player.health} and monster health {currentRoom.monster.health}")
-                        
+                            if player.health <= 0:
+                                playerDead = True
+                                gameOver = True
                             
 
 
@@ -391,6 +405,9 @@ while run:
                                 if player.checkPlayerAlive() == False:
                                     print("Player has died")
                             print(f"End Attack: player health {player.health} and monster health {currentRoom.monster.health}")
+                            if player.health <= 0:
+                                playerDead = True
+                                gameOver = True
 
                     if 100 <= mouse[0] <= 190 and 450 <= mouse[1] <= 475:
                         print("Use item")
