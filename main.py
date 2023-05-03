@@ -80,9 +80,17 @@ class Player():
         self.max_health = 15
         self.health = 15
         self.base_damage = 10
-        self.damage = 15
+        self.buff_damage = 0
+        self.weapon_damage = self.equipped_item.damage
         self.base_defense = 9
-        self.defense = 9
+        self.buff_defense = 0
+
+    def CalcDamage(self):
+        return self.base_damage + self.buff_damage + self.weapon_damage
+    
+    def CalcDefense(self):
+        return self.base_defense + self.buff_defense
+
 
     def checkPlayerAlive(self):
         if self.health <= 0:
@@ -132,7 +140,7 @@ def printInventory(screen, sprite, player):
             if player.inventory[j][i] is not None:
                 screen.blit(player.sprites_list[j][i].surf, [50 + i*60, 50 + j*60, 50, 50])
     screen.blit(player_sprite.surf, (WIDTH/10 * 8, HEIGHT/4))
-    text = smallfont.render(f"Health: {player.health}   Damage: {player.damage}   Defense: {player.defense}", True, (255, 255, 255))
+    text = smallfont.render(f"Health: {player.health}   Damage: {player.CalcDamage()}   Defense: {player.CalcDefense()}", True, (255, 255, 255))
     screen.blit(text, (WIDTH/4, 200))
 
 # Setup
@@ -279,18 +287,26 @@ while run:
             if (not show_inventory) and (currentRoom.roomType == "safe"): # can't change rooms accidentally when inventory is open
                 # clicking on arrow
                 if 235 <= mouse[0] < 270 and 25 <= mouse[1] <= 70 and "North" in validMoves: # northArrow.rect.collidepoint(mouse)
+                    player.buff_damage = 0
+                    player.buff_defense = 0 # remove buffs on room change
                     sprites.ArrowSprite.Clicked(northArrow)
                     currentRoom = room.Room.SpawnRoom(map, currentRoom, (currentRoom.x, currentRoom.y), numDefeated, "north")
                     print("current room coordinates are (" + str(currentRoom.x) + "," + str(currentRoom.y) + ")")
                 elif 430 <= mouse[0] < 475 and 205 <= mouse[1] <= 240 and "East" in validMoves:
+                    player.buff_damage = 0
+                    player.buff_defense = 0 # remove buffs on room change
                     sprites.ArrowSprite.Clicked(eastArrow)
                     currentRoom = room.Room.SpawnRoom(map, currentRoom, (currentRoom.x, currentRoom.y), numDefeated, "east")
                     print("current room coordinates are (" + str(currentRoom.x) + "," + str(currentRoom.y) + ")")
                 elif 235 <= mouse[0] < 270 and 400 <= mouse[1] <= 445 and "South" in validMoves:
+                    player.buff_damage = 0
+                    player.buff_defense = 0 # remove buffs on room change
                     sprites.ArrowSprite.Clicked(southArrow)
                     currentRoom = room.Room.SpawnRoom(map, currentRoom, (currentRoom.x, currentRoom.y), numDefeated, "south")
                     print("current room coordinates are (" + str(currentRoom.x) + "," + str(currentRoom.y) + ")")
                 elif 30 <= mouse[0] < 75 and 205 <= mouse[1] <= 240 and "West" in validMoves:
+                    player.buff_damage = 0
+                    player.buff_defense = 0 # remove buffs on room change
                     sprites.ArrowSprite.Clicked(westArrow)
                     currentRoom = room.Room.SpawnRoom(map, currentRoom, (currentRoom.x, currentRoom.y), numDefeated, "west")
                     print("current room coordinates are (" + str(currentRoom.x) + "," + str(currentRoom.y) + ")")
@@ -397,19 +413,14 @@ while run:
                         print("yes clicked")
                         show_prompt = False
                         item_type = selected_item.type
-                        if item_type == "Axe" or item_type == "Rusty Sword" or item_type == "Bow":
+                        if item_type == "Axe" or item_type == "Rusty Sword" or item_type == "Bow": # player is swapping weapons
                             print("swap weapon")
                             player.inventory[inventory_coords[0]][inventory_coords[1]] = player.equipped_item # place equipped weapon into inventory, then put inventory weapon selected to equipped
                             player.equipped_item = selected_item
-                            player.damage = player.equipped_item.damage + player.base_damage # add the base damage of the player to the weapon's damage for total
+                            player.weapon_damage = player.equipped_item.damage
                             player.sprites_list[inventory_coords[0]][inventory_coords[1]] = player.equipped_sprite
-                            if item_type == "Axe":
-                                player.equipped_sprite = sprites.AxeSprite()
-                            elif item_type == "Rusty Sword":
-                                player.equipped_sprite = sprites.RustySwordSprite()
-                            else:
-                                player.equipped_sprite = sprites.BowSprite()
-                        else:
+                            player.equipped_sprite = return_sprite(selected_item)
+                        else: # player is using a spell
                             print("spell selected")
                             if item_type == "Healing":
                                 player.health += selected_item.effect 
@@ -418,8 +429,13 @@ while run:
                                 print("healing")
                             elif item_type == "Attack Buff":
                                 print("attack buff")
+                                player.buff_damage = selected_item.effect
                             else: # defense buff
                                 print("defense buff")
+                                player.buff_defense = selected_item.effect 
+                            # remove spell from inventory and sprites list (one time use)
+                            player.inventory[inventory_coords[0]][inventory_coords[1]] = None
+                            player.sprites_list[inventory_coords[0]][inventory_coords[1]] = None
 
                     elif 270 <= mouse[0] <= 360 and 350 <= mouse[1] <= 375:
                         print("no clicked")
@@ -450,7 +466,7 @@ while run:
                 # Clicked Attack button
                 if 200 <= mouse[0] <= 290 and 450 <= mouse[1] <= 475:
                     print(f"Attack: player health {player.health} and monster health {currentRoom.monster.health}")
-                    currentRoom.monster.takeDamage(player.damage)
+                    currentRoom.monster.takeDamage(player.CalcDamage())
                     if (currentRoom.monster.checkAlive()):
                         print("The monster has died")
                         currentRoom.DefeatedRoom()
@@ -459,8 +475,8 @@ while run:
                         action = currentRoom.monster.pickAction()
                         print(f"Monster Action: {action}")
                         if action[0] == "attack":
-                            if action[1] > player.defense:
-                                player.health -= action[1] - player.defense
+                            if action[1] > player.CalcDefense():
+                                player.health -= action[1] - player.CalcDefense()
                         print(f"End Attack: player health {player.health} and monster health {currentRoom.monster.health}")
                     
                         
@@ -474,6 +490,8 @@ while run:
                     if chance < 0.3:
                         print("run away successfully")
                         #TODO lose an item in inventory
+                        player.buff_damage = 0
+                        player.buff_defense = 0 # spell buffs are removed upon room change 
                         newRoom = random.choice(validMoves)
                         print(newRoom)
                         if newRoom == "North": # northArrow.rect.collidepoint(mouse)
@@ -498,8 +516,8 @@ while run:
                         action = currentRoom.monster.pickAction()
                         print(f"Monster Action: {action}")
                         if action[0] == "attack":
-                            if action[1] > player.defense:
-                                player.health -= action[1] - player.defense
+                            if action[1] > player.CalcDefense():
+                                player.health -= action[1] - player.CalcDefense()
                             if player.checkPlayerAlive() == False:
                                 print("Player has died")
                         print(f"End Attack: player health {player.health} and monster health {currentRoom.monster.health}")
