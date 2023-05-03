@@ -78,12 +78,12 @@ class Player():
             for j in range(INVENTORY_WIDTH):
                 self.inventory[i].append(None)
                 self.sprites_list[i].append(None)
-        self.max_health = 15
-        self.health = 15
-        self.base_damage = 10
+        self.max_health = 20
+        self.health = 20
+        self.base_damage = 6
         self.buff_damage = 0
         self.weapon_damage = self.equipped_item.damage
-        self.base_defense = 9
+        self.base_defense = 3
         self.buff_defense = 0
 
     def CalcDamage(self):
@@ -194,7 +194,6 @@ player.add_inventory(test_item)
 player.add_inventory(test_item2)
 print(player.inventory)
 print(player.sprites_list)
-monster = sprites.MonsterSprite(MONSTER_IMAGES[0])
 inventory = sprites.InventorySprite()
 
 # Observer Pattern
@@ -269,7 +268,7 @@ while run:
             screen.blit(text, (224, 457))
         else:
             screen.blit(bg_monster, (0,0)) # monster background
-            screen.blit((monster.surf), ((3 * WIDTH)/4, HEIGHT/2))
+            screen.blit((currentRoom.monster.image.surf), ((3 * WIDTH)/4, HEIGHT/2))
             pygame.draw.rect(screen, (100, 100, 100), [25, 450, 50, 25]) # Run away
             text = smallfont.render("Run", True, (255, 255, 255))
             screen.blit(text, (32, 457))
