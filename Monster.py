@@ -52,9 +52,11 @@ class Monster():
         #if it is attacking
         if choice == "attack":
             damage = self.attack()
+            self.defense = self.base_defense
             return ["attack", damage]
         elif choice == 'defend':
-            return ["defend", self.health]
+            self.defense = self.base_defense + self.healing
+            return ["defend", self.defense]
 
     #Will return the damage done by the monster
     def attack(self):
@@ -101,9 +103,10 @@ class Goblin(Monster):
         self.image = sprites.MonsterSprite(self.image_name)
         Monster.__init__(self, "goblin.png", "Offensive")
         self.health = 10
-        self.damage = 5
+        self.damage = 4
         self.defense = 2
-        self.healing = 1
+        self.base_defense = 2
+        self.healing = 3
 
 #Cheeseman my beloved
 class Cheeseman(Monster):
@@ -114,7 +117,8 @@ class Cheeseman(Monster):
         self.health = 20
         self.damage = 2
         self.defense = 2
-        self.healing = 1
+        self.base_defense = 2
+        self.healing = 3
 
 
 class Slime(Monster):
@@ -126,7 +130,8 @@ class Slime(Monster):
         self.health = 20
         self.damage = 3
         self.defense = 2
-        self.healing = 3
+        self.base_defense = 2
+        self.healing = 4
 
 
 class Monkey(Monster):
@@ -136,9 +141,10 @@ class Monkey(Monster):
         self.image = sprites.MonsterSprite(self.image_name)
         Monster.__init__(self, "monkey.png", "Offensive")
         self.health = 15
-        self.damage = 7
-        self.defense = 1
-        self.healing = 2
+        self.damage = 5
+        self.defense = 2
+        self.base_defense = 2
+        self.healing = 4
 
 #Cool chad boss guy
 class Boss(Monster):
@@ -147,6 +153,7 @@ class Boss(Monster):
         self.image = sprites.MonsterSprite(self.image_name)
         Monster.__init__(self, "MediumFinalBoss.png", "Balanced")
         self.health = 40
-        self.damage = 6
+        self.damage = 5
+        self.base_defense = 5
         self.defense = 5
-        self.healing = 3
+        self.healing = 5
