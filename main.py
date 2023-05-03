@@ -34,38 +34,6 @@ import os
 MONSTER_IMAGES = ["goblin.png", "funnyRockGuy.png"]
 INVENTORY_WIDTH = 5
 INVENTORY_HEIGHT = 2
-
-def get_item_type(curr_item):
-    if isinstance(curr_item, item.Healing):
-        return "healing"
-    elif isinstance(curr_item, item.DefenseBuff):
-        return "defense"
-    elif isinstance(curr_item, item.AttackBuff):
-        return "attack"
-    elif isinstance(curr_item, item.Axe):
-        return "axe"
-    elif isinstance(curr_item, item.RustySword):
-        return "sword"
-    elif isinstance(curr_item, item.Bow):
-        return "bow"
-    else:
-        return "none"
-    
-def return_sprite(curr_item):
-    if get_item_type(curr_item) == "healing":
-        return sprites.HealingSprite()
-    elif get_item_type(curr_item) == "defense":
-        return sprites.DefenseSprite()
-    elif get_item_type(curr_item) == "attack":
-        return sprites.AttackSprite()
-    elif get_item_type(curr_item) == "axe":
-        return sprites.AxeSprite()
-    elif get_item_type(curr_item) == "sword":
-        return sprites.RustySwordSprite()
-    elif get_item_type(curr_item) == "bow":
-        return sprites.BowSprite()
-    else:
-        return "none"
     
 class Player():
     def __init__(self):
@@ -98,16 +66,16 @@ class Player():
         if self.health <= 0:
             return False
         return True
-    def add_inventory(self, item):
+    def add_inventory(self, curr_item):
         # Maximum of 10 items in inventory - otherwise, the first one is automatically overwritten
         for i in range(INVENTORY_HEIGHT):
             for j in range(INVENTORY_WIDTH):
                 if self.inventory[i][j] is None:
-                    self.inventory[i][j] = item
-                    self.sprites_list[i][j] = return_sprite(item)
+                    self.inventory[i][j] = curr_item
+                    self.sprites_list[i][j] = item.return_sprite(curr_item)
                     return
-        self.inventory[0][0] = item
-        self.sprites_list[0][0] = return_sprite(item)
+        self.inventory[0][0] = curr_item
+        self.sprites_list[0][0] = item.return_sprite(curr_item)
 
 def PrintMap(map, currentRoom, screen):
     pygame.draw.rect(screen, (0,0,0), [300, 40, 135, 135]) # mini-map backdrop
@@ -129,28 +97,6 @@ def PrintMap(map, currentRoom, screen):
             pygame.draw.rect(screen, color, [300 + i*27, 40 + j*27, 25, 25]) # Inventory
     text = smallfont.render("P", True, (255, 255, 255))
     screen.blit(text, (362 + (currentRoom.x)*27, 99 + (currentRoom.y)*27))
-
-def printInventory(screen, sprite, player):
-    pygame.draw.rect(screen, (100,100,100), [0, 0, 500, 500]) # background
-    screen.blit(sprites.XSprite().surf, (WIDTH/10 * 9, HEIGHT/40))
-
-    # Draws the inventory rectangles
-    for i in range(5):
-        for j in range(2):
-            color = (200, 200, 200)
-            pygame.draw.rect(screen, color, [50 + i*60, 50 + j*60, 50, 50])
-            if player.inventory[j][i] is not None:
-                screen.blit(player.sprites_list[j][i].surf, [50 + i*60, 50 + j*60, 50, 50])
-    screen.blit(player_sprite.surf, (WIDTH/10 * 8 - 8, HEIGHT/4 + 5))
-    text = smallfont.render(f"Health: {player.health}   Damage: {player.CalcDamage()}   Defense: {player.CalcDefense()}", True, (255, 255, 255))
-    screen.blit(text, (WIDTH/4, 200))
-
-    # currently equipped item sprite and text 
-    text = smallfont.render("Equipped", True, (255,255,255))
-    screen.blit(text, (375, 30))
-    screen.blit(player.equipped_sprite.surf, (380, 50))
-    text = smallfont.render("Damage: " + str(player.equipped_item.damage), True, (255,255,255))
-    screen.blit(text, (370, 105))
 
 # Setup
 WIDTH = 500
@@ -200,7 +146,6 @@ player.add_inventory(test_item2)
 print(player.inventory)
 print(player.sprites_list)
 monster = sprites.MonsterSprite(MONSTER_IMAGES[0])
-inventory = sprites.InventorySprite()
 
 # Observer Pattern
 events = eventManager.ConcreteEventManager()
@@ -313,13 +258,13 @@ while run:
         screen.blit(player_sprite.surf, (WIDTH/4, HEIGHT/2))
 
         if (show_inventory):
-            printInventory(screen, player_sprite, player)
+            item.printInventory(screen, player_sprite, player, WIDTH, HEIGHT, smallfont)
 
         if show_prompt: # the item use prompt and change equipment prompt
         
             # background rectangle
             item_text = ""
-            item_type = get_item_type(selected_item)
+            item_type = item.get_item_type(selected_item)
             if item_type == "axe" or item_type == "sword" or item_type == "bow":
                 item_text = "Would you like to swap weapons?"
             else:
@@ -338,7 +283,7 @@ while run:
 
             # Currently selected item details - show sprite, item name, damage / spell effect amount
             pygame.draw.rect(screen, (200, 200, 200), [100, 400, 300, 80])
-            screen.blit(return_sprite(selected_item).surf, (120, 415))
+            screen.blit(item.return_sprite(selected_item).surf, (120, 415))
             text = smallfont.render(selected_item.type, True, (0,0,0))
             screen.blit(text, (200, 420))
             if item_type == "axe" or item_type == "sword" or item_type == "bow": 
@@ -472,7 +417,7 @@ while run:
                                 player.equipped_item = selected_item
                                 player.weapon_damage = player.equipped_item.damage
                                 player.sprites_list[inventory_coords[0]][inventory_coords[1]] = player.equipped_sprite
-                                player.equipped_sprite = return_sprite(selected_item)
+                                player.equipped_sprite = item.return_sprite(selected_item)
                             else: # player is using a spell
                                 print("spell selected")
                                 if item_type == "Healing":
