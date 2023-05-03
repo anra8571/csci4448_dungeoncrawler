@@ -3,7 +3,9 @@
 # https://stackoverflow.com/questions/28005641/how-to-add-a-background-image-into-pygame: Adding background images
 # https://www.pygame.org/docs/ref/cursors.html: Cursors
 # Music for battle rooms: Hitman by Kevin MacLeod | https://incompetech.com/ Music promoted by https://www.chosic.com/free-music/all/ Creative Commons CC BY 3.0 https://creativecommons.org/licenses/by/3.0/
- # Music for normal and chest rooms: My Dark Passenger by Darren Curtis | https://www.darrencurtismusic.com/ Music promoted by https://www.chosic.com/free-music/all/ Creative Commons CC BY 3.0 https://creativecommons.org/licenses/by/3.0/
+# Music for normal and chest rooms: My Dark Passenger by Darren Curtis | https://www.darrencurtismusic.com/ Music promoted by https://www.chosic.com/free-music/all/ Creative Commons CC BY 3.0 https://creativecommons.org/licenses/by/3.0/
+# Win Endscreen: https://www.pinterest.com/pin/92323861089462914/
+
 import item
 import room
 import chest
@@ -32,38 +34,6 @@ import os
 MONSTER_IMAGES = ["goblin.png", "funnyRockGuy.png"]
 INVENTORY_WIDTH = 5
 INVENTORY_HEIGHT = 2
-
-def get_item_type(curr_item):
-    if isinstance(curr_item, item.Healing):
-        return "healing"
-    elif isinstance(curr_item, item.DefenseBuff):
-        return "defense"
-    elif isinstance(curr_item, item.AttackBuff):
-        return "attack"
-    elif isinstance(curr_item, item.Axe):
-        return "axe"
-    elif isinstance(curr_item, item.RustySword):
-        return "sword"
-    elif isinstance(curr_item, item.Bow):
-        return "bow"
-    else:
-        return "none"
-    
-def return_sprite(curr_item):
-    if get_item_type(curr_item) == "healing":
-        return sprites.HealingSprite()
-    elif get_item_type(curr_item) == "defense":
-        return sprites.DefenseSprite()
-    elif get_item_type(curr_item) == "attack":
-        return sprites.AttackSprite()
-    elif get_item_type(curr_item) == "axe":
-        return sprites.AxeSprite()
-    elif get_item_type(curr_item) == "sword":
-        return sprites.RustySwordSprite()
-    elif get_item_type(curr_item) == "bow":
-        return sprites.BowSprite()
-    else:
-        return "none"
     
 class Player():
     def __init__(self):
@@ -96,16 +66,16 @@ class Player():
         if self.health <= 0:
             return False
         return True
-    def add_inventory(self, item):
+    def add_inventory(self, curr_item):
         # Maximum of 10 items in inventory - otherwise, the first one is automatically overwritten
         for i in range(INVENTORY_HEIGHT):
             for j in range(INVENTORY_WIDTH):
                 if self.inventory[i][j] is None:
-                    self.inventory[i][j] = item
-                    self.sprites_list[i][j] = return_sprite(item)
+                    self.inventory[i][j] = curr_item
+                    self.sprites_list[i][j] = item.return_sprite(curr_item)
                     return
-        self.inventory[0][0] = item
-        self.sprites_list[0][0] = return_sprite(item)
+        self.inventory[0][0] = curr_item
+        self.sprites_list[0][0] = item.return_sprite(curr_item)
 
 def PrintMap(map, currentRoom, screen):
     pygame.draw.rect(screen, (0,0,0), [300, 40, 135, 135]) # mini-map backdrop
@@ -128,28 +98,6 @@ def PrintMap(map, currentRoom, screen):
     text = smallfont.render("P", True, (255, 255, 255))
     screen.blit(text, (362 + (currentRoom.x)*27, 99 + (currentRoom.y)*27))
 
-def printInventory(screen, sprite, player):
-    pygame.draw.rect(screen, (100,100,100), [0, 0, 500, 500]) # background
-    screen.blit(sprites.XSprite().surf, (WIDTH/10 * 9, HEIGHT/40))
-
-    # Draws the inventory rectangles
-    for i in range(5):
-        for j in range(2):
-            color = (200, 200, 200)
-            pygame.draw.rect(screen, color, [50 + i*60, 50 + j*60, 50, 50])
-            if player.inventory[j][i] is not None:
-                screen.blit(player.sprites_list[j][i].surf, [50 + i*60, 50 + j*60, 50, 50])
-    screen.blit(player_sprite.surf, (WIDTH/10 * 8 - 8, HEIGHT/4 + 5))
-    text = smallfont.render(f"Health: {player.health}   Damage: {player.CalcDamage()}   Defense: {player.CalcDefense()}", True, (255, 255, 255))
-    screen.blit(text, (WIDTH/4, 200))
-
-    # currently equipped item sprite and text 
-    text = smallfont.render("Equipped", True, (255,255,255))
-    screen.blit(text, (375, 30))
-    screen.blit(player.equipped_sprite.surf, (380, 50))
-    text = smallfont.render("Damage: " + str(player.equipped_item.damage), True, (255,255,255))
-    screen.blit(text, (370, 105))
-
 # Setup
 WIDTH = 500
 HEIGHT = 500
@@ -163,14 +111,17 @@ bg_safe_path = os.path.join("graphics", "bg_safe.png")
 bg_safe = pygame.image.load(bg_safe_path)
 bg_boss_path = os.path.join("graphics", "bossBackground.png")
 bg_boss = pygame.image.load(bg_boss_path)
-bg_tempW_path = os.path.join("graphics", "tempWinBackground.png")
+bg_tempW_path = os.path.join("graphics", "won.gif")
 bg_tempW = pygame.image.load(bg_tempW_path)
-bg_tempStart_path = os.path.join("graphics", "tempStart.png")
+bg_tempStart_path = os.path.join("graphics", "start.png")
+campfire_sprite = sprites.FireSprite()
 bg_tempStart = pygame.image.load(bg_tempStart_path)
+bg_tempStart.set_colorkey((0, 0, 0), RLEACCEL)
 bg_death_path = os.path.join("graphics", "tempDeath.png")
 bg_death = pygame.image.load(bg_death_path)
 smallfont = pygame.font.SysFont('Corbel', 16)
 bigfont = pygame.font.SysFont('Corbel', 34)
+endfont = pygame.font.Font("ARCADECLASSIC.TTF", 36)
 show_inventory = False
 pygame.mixer.music.load("My-Dark-Passenger.mp3")
 pygame.mixer.music.play()
@@ -194,7 +145,6 @@ player.add_inventory(test_item)
 player.add_inventory(test_item2)
 print(player.inventory)
 print(player.sprites_list)
-inventory = sprites.InventorySprite()
 
 # Observer Pattern
 events = eventManager.ConcreteEventManager()
@@ -215,16 +165,18 @@ numDefeated = 0 # number of enemies defeated
 run = True
 while run:
     if gameStart and not instructions:
-        screen.blit(bg_tempStart, (0, 0))
-        pygame.draw.rect(screen, (100, 100, 100), [210, 450, 90, 25]) # Inventory
-        text = smallfont.render("Start Game", True, (255, 255, 255))
-        screen.blit(text, (224, 457))
+        screen.blit(bg_tempStart, (0, 0)) # Start screen
+        screen.blit(campfire_sprite.surf, (WIDTH/3 + 35, HEIGHT/4))
+        # pygame.draw.rect(screen, (100, 100, 100), [210, 450, 90, 25]) # Inventory
+        # text = smallfont.render("Start Game", True, (255, 255, 255))
+        # screen.blit(text, (224, 457))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
             if event.type == MOUSEBUTTONDOWN:
                 mouse = pygame.mouse.get_pos()
-                if 210 <= mouse[0] <= 290 and 450 <= mouse[1] <= 475:
+                print(mouse)
+                if 195 <= mouse[0] <= 320 and 395 <= mouse[1] <= 435:
                         print("clicked inventory")
                         gameStart = False
     elif gameOver:
@@ -235,8 +187,11 @@ while run:
                     run = False
                 if event.type == MOUSEBUTTONDOWN:
                     print(mouse)
+        # Player won
         else:
             screen.blit(bg_tempW, (0, 0))
+            text = endfont.render("You Won!", True, (255, 255, 255))
+            screen.blit(text, (190, HEIGHT/2 - 50))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
@@ -302,13 +257,13 @@ while run:
         screen.blit(player_sprite.surf, (WIDTH/4, HEIGHT/2))
 
         if (show_inventory):
-            printInventory(screen, player_sprite, player)
+            item.printInventory(screen, player_sprite, player, WIDTH, HEIGHT, smallfont)
 
         if show_prompt: # the item use prompt and change equipment prompt
         
             # background rectangle
             item_text = ""
-            item_type = get_item_type(selected_item)
+            item_type = item.get_item_type(selected_item)
             if item_type == "axe" or item_type == "sword" or item_type == "bow":
                 item_text = "Would you like to swap weapons?"
             else:
@@ -327,7 +282,7 @@ while run:
 
             # Currently selected item details - show sprite, item name, damage / spell effect amount
             pygame.draw.rect(screen, (200, 200, 200), [100, 400, 300, 80])
-            screen.blit(return_sprite(selected_item).surf, (120, 415))
+            screen.blit(item.return_sprite(selected_item).surf, (120, 415))
             text = smallfont.render(selected_item.type, True, (0,0,0))
             screen.blit(text, (200, 420))
             if item_type == "axe" or item_type == "sword" or item_type == "bow": 
@@ -346,7 +301,6 @@ while run:
             if event.type == pygame.QUIT:
                 run = False
             if event.type == MOUSEBUTTONDOWN:
-                print(mouse)
                 if (not show_inventory) and (currentRoom.roomType == "safe"): # can't change rooms accidentally when inventory is open
                     # clicking on arrow
                     if 235 <= mouse[0] < 270 and 25 <= mouse[1] <= 70 and "North" in validMoves: # northArrow.rect.collidepoint(mouse)
@@ -462,7 +416,7 @@ while run:
                                 player.equipped_item = selected_item
                                 player.weapon_damage = player.equipped_item.damage
                                 player.sprites_list[inventory_coords[0]][inventory_coords[1]] = player.equipped_sprite
-                                player.equipped_sprite = return_sprite(selected_item)
+                                player.equipped_sprite = item.return_sprite(selected_item)
                             else: # player is using a spell
                                 print("spell selected")
                                 if item_type == "Healing":

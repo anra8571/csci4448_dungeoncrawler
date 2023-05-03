@@ -1,3 +1,5 @@
+# Fire Art: https://www.pinterest.co.kr/pin/361836151308159504/
+
 import pygame
 import os
 from pygame.locals import (
@@ -12,6 +14,14 @@ from pygame.locals import (
     MOUSEBUTTONDOWN,
 )
 
+class FireSprite(pygame.sprite.Sprite):
+    def __init__(self):
+        super(FireSprite, self).__init__()
+        char_path = os.path.join("graphics", "campfire.gif")
+        self.surf = pygame.image.load(char_path).convert()
+        self.surf.set_colorkey((0, 0, 0), RLEACCEL)
+        self.rect = self.surf.get_rect()
+
 class PlayerSprite(pygame.sprite.Sprite):
     def __init__(self):
         super(PlayerSprite, self).__init__()
@@ -24,14 +34,6 @@ class MonsterSprite(pygame.sprite.Sprite):
     def __init__(self, image_name):
         super(MonsterSprite, self).__init__()
         char_path = os.path.join("graphics", image_name)
-        self.surf = pygame.image.load(char_path).convert()
-        self.surf.set_colorkey((0, 0, 0), RLEACCEL)
-        self.rect = self.surf.get_rect()
-
-class InventorySprite(pygame.sprite.Sprite):
-    def __init__(self):
-        super(InventorySprite, self).__init__()
-        char_path = os.path.join("graphics", "inventory.png")
         self.surf = pygame.image.load(char_path).convert()
         self.surf.set_colorkey((0, 0, 0), RLEACCEL)
         self.rect = self.surf.get_rect()
