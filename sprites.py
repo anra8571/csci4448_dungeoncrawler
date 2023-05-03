@@ -1,3 +1,6 @@
+# Fire Art: https://www.pinterest.co.kr/pin/361836151308159504/
+
+
 import pygame
 import os
 from pygame.locals import (

@@ -3,7 +3,9 @@
 # https://stackoverflow.com/questions/28005641/how-to-add-a-background-image-into-pygame: Adding background images
 # https://www.pygame.org/docs/ref/cursors.html: Cursors
 # Music for battle rooms: Hitman by Kevin MacLeod | https://incompetech.com/ Music promoted by https://www.chosic.com/free-music/all/ Creative Commons CC BY 3.0 https://creativecommons.org/licenses/by/3.0/
- # Music for normal and chest rooms: My Dark Passenger by Darren Curtis | https://www.darrencurtismusic.com/ Music promoted by https://www.chosic.com/free-music/all/ Creative Commons CC BY 3.0 https://creativecommons.org/licenses/by/3.0/
+# Music for normal and chest rooms: My Dark Passenger by Darren Curtis | https://www.darrencurtismusic.com/ Music promoted by https://www.chosic.com/free-music/all/ Creative Commons CC BY 3.0 https://creativecommons.org/licenses/by/3.0/
+# Win Endscreen: https://www.pinterest.com/pin/92323861089462914/
+
 import item
 import room
 import chest
@@ -163,7 +165,7 @@ bg_safe_path = os.path.join("graphics", "bg_safe.png")
 bg_safe = pygame.image.load(bg_safe_path)
 bg_boss_path = os.path.join("graphics", "bossBackground.png")
 bg_boss = pygame.image.load(bg_boss_path)
-bg_tempW_path = os.path.join("graphics", "tempWinBackground.png")
+bg_tempW_path = os.path.join("graphics", "won.gif")
 bg_tempW = pygame.image.load(bg_tempW_path)
 bg_tempStart_path = os.path.join("graphics", "start.png")
 campfire_sprite = sprites.FireSprite()
@@ -173,6 +175,7 @@ bg_death_path = os.path.join("graphics", "tempDeath.png")
 bg_death = pygame.image.load(bg_death_path)
 smallfont = pygame.font.SysFont('Corbel', 16)
 bigfont = pygame.font.SysFont('Corbel', 34)
+endfont = pygame.font.Font("ARCADECLASSIC.TTF", 36)
 show_inventory = False
 pygame.mixer.music.load("My-Dark-Passenger.mp3")
 pygame.mixer.music.play()
@@ -240,8 +243,11 @@ while run:
                     run = False
                 if event.type == MOUSEBUTTONDOWN:
                     print(mouse)
+        # Player won
         else:
             screen.blit(bg_tempW, (0, 0))
+            text = endfont.render("You Won!", True, (255, 255, 255))
+            screen.blit(text, (190, HEIGHT/2 - 50))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
