@@ -8,6 +8,7 @@ import item
 import room
 import chest
 import sprites
+import eventManager
 import pygame
 import MonsterFactory
 import random
@@ -175,8 +176,6 @@ selected_item = None
 show_prompt = False
 inventory_coords = [0,0]
 
-# pygame.cursors.Cursor()
-
 # Instanciate starting objects
 player_sprite = sprites.PlayerSprite()
 player = Player()
@@ -188,6 +187,11 @@ print(player.inventory)
 print(player.sprites_list)
 monster = sprites.MonsterSprite(MONSTER_IMAGES[0])
 inventory = sprites.InventorySprite()
+
+# Observer Pattern
+events = eventManager.ConcreteEventManager()
+logger = eventManager.Logger()
+events.registerObserver(logger)
 
 northArrow = sprites.ArrowSprite("North")
 eastArrow = sprites.ArrowSprite("East")
@@ -340,6 +344,7 @@ while run:
                         acquired_item = currentRoom.chest.open()
                         if acquired_item != None:
                             player.add_inventory(acquired_item)
+                            events.acquireItem()
                         print(f"Inventory: {player.inventory}")
             
 
@@ -478,7 +483,7 @@ while run:
                             if action[1] > player.CalcDefense():
                                 player.health -= action[1] - player.CalcDefense()
                         print(f"End Attack: player health {player.health} and monster health {currentRoom.monster.health}")
-                    
+
                 #Clicked the run away button
                 if 25 <= mouse[0] <= 115 and 450 <= mouse[1] <= 475:
                     print("Tried to run away")
@@ -521,7 +526,6 @@ while run:
                 if 100 <= mouse[0] <= 190 and 450 <= mouse[1] <= 475:
                     print("Use item")
                     show_inventory = True
-
 
     pygame.display.update()
 
