@@ -165,8 +165,10 @@ bg_boss_path = os.path.join("graphics", "bossBackground.png")
 bg_boss = pygame.image.load(bg_boss_path)
 bg_tempW_path = os.path.join("graphics", "tempWinBackground.png")
 bg_tempW = pygame.image.load(bg_tempW_path)
-bg_tempStart_path = os.path.join("graphics", "tempStart.png")
+bg_tempStart_path = os.path.join("graphics", "start.png")
+campfire_sprite = sprites.FireSprite()
 bg_tempStart = pygame.image.load(bg_tempStart_path)
+bg_tempStart.set_colorkey((0, 0, 0), RLEACCEL)
 bg_death_path = os.path.join("graphics", "tempDeath.png")
 bg_death = pygame.image.load(bg_death_path)
 smallfont = pygame.font.SysFont('Corbel', 16)
@@ -216,16 +218,18 @@ numDefeated = 0 # number of enemies defeated
 run = True
 while run:
     if gameStart and not instructions:
-        screen.blit(bg_tempStart, (0, 0))
-        pygame.draw.rect(screen, (100, 100, 100), [210, 450, 90, 25]) # Inventory
-        text = smallfont.render("Start Game", True, (255, 255, 255))
-        screen.blit(text, (224, 457))
+        screen.blit(bg_tempStart, (0, 0)) # Start screen
+        screen.blit(campfire_sprite.surf, (WIDTH/3 + 35, HEIGHT/4))
+        # pygame.draw.rect(screen, (100, 100, 100), [210, 450, 90, 25]) # Inventory
+        # text = smallfont.render("Start Game", True, (255, 255, 255))
+        # screen.blit(text, (224, 457))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
             if event.type == MOUSEBUTTONDOWN:
                 mouse = pygame.mouse.get_pos()
-                if 210 <= mouse[0] <= 290 and 450 <= mouse[1] <= 475:
+                print(mouse)
+                if 195 <= mouse[0] <= 320 and 395 <= mouse[1] <= 435:
                         print("clicked inventory")
                         gameStart = False
     elif gameOver:
@@ -347,7 +351,6 @@ while run:
             if event.type == pygame.QUIT:
                 run = False
             if event.type == MOUSEBUTTONDOWN:
-                print(mouse)
                 if (not show_inventory) and (currentRoom.roomType == "safe"): # can't change rooms accidentally when inventory is open
                     # clicking on arrow
                     if 235 <= mouse[0] < 270 and 25 <= mouse[1] <= 70 and "North" in validMoves: # northArrow.rect.collidepoint(mouse)

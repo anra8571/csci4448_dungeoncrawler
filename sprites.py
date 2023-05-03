@@ -12,6 +12,14 @@ from pygame.locals import (
     MOUSEBUTTONDOWN,
 )
 
+class FireSprite(pygame.sprite.Sprite):
+    def __init__(self):
+        super(FireSprite, self).__init__()
+        char_path = os.path.join("graphics", "campfire.gif")
+        self.surf = pygame.image.load(char_path).convert()
+        self.surf.set_colorkey((0, 0, 0), RLEACCEL)
+        self.rect = self.surf.get_rect()
+
 class PlayerSprite(pygame.sprite.Sprite):
     def __init__(self):
         super(PlayerSprite, self).__init__()
