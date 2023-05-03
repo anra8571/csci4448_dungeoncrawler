@@ -34,16 +34,19 @@ class Healing(Spell):
     def __init__(self):
         super().__init__()
         self.effect = random.randint(2, 4)
+        self.type = "Healing"
 
 class AttackBuff(Spell):
     def __init__(self):
         super().__init__()
         self.effect = random.randint(1, 5)
+        self.type = "Attack Buff"
 
 class DefenseBuff(Spell):
     def __init__(self):
         super().__init__()
         self.effect = random.randint(2, 3)
+        self.type = "Defense Buff"
 
 class Weapon(Item):
     def __init__(self):
@@ -56,16 +59,19 @@ class RustySword(Weapon):
     def __init__(self):
         super().__init__()
         self.damage = random.randint(1, 2)
+        self.type = "Rusty Sword"
 
 class Axe(Weapon):
     def __init__(self):
         super().__init__()
         self.damage = random.randint(2, 4)
+        self.type = "Axe"
 
 class Bow(Weapon):
     def __init__(self):
         super().__init__()
         self.damage = random.randint(1, 3)
+        self.type = "Bow"
 
 class Pool:
     def __init__(self, size=10):

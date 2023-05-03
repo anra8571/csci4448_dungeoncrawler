@@ -67,6 +67,8 @@ def return_sprite(curr_item):
 class Player():
     def __init__(self):
         self.inventory = []
+        self.equipped_item = item.RustySword() # start off with this, and have as current equipped. Damage based on this
+        self.equipped_sprite = sprites.RustySwordSprite()
         self.sprites_list = []
         for i in range(INVENTORY_HEIGHT):
             self.inventory.append([])
@@ -75,8 +77,11 @@ class Player():
             for j in range(INVENTORY_WIDTH):
                 self.inventory[i].append(None)
                 self.sprites_list[i].append(None)
+        self.max_health = 15
         self.health = 15
+        self.base_damage = 10
         self.damage = 15
+        self.base_defense = 9
         self.defense = 9
 
     def checkPlayerAlive(self):
@@ -148,6 +153,10 @@ pygame.mixer.music.load("My-Dark-Passenger.mp3")
 pygame.mixer.music.play()
 curr_music = 'safe'
 
+selected_item = None
+show_prompt = False
+inventory_coords = [0,0]
+
 # pygame.cursors.Cursor()
 
 # Instanciate starting objects
@@ -215,9 +224,6 @@ while run:
 
     PrintMap(map, currentRoom, screen)
 
-
-
-
     validMoves = [] # get valid moves so we put arrows in the right spots
 
     if currentRoom.y > -2:
@@ -238,6 +244,28 @@ while run:
     if (show_inventory):
         printInventory(screen, player_sprite, player)
 
+    if show_prompt: # the item use prompt and change equipment prompt
+        
+        # background rectangle
+        item_text = ""
+        item_type = selected_item.type
+        if item_type == "Axe" or item_type == "Rusty Sword" or item_type == "Bow":
+            item_text = "Would you like to swap weapons?"
+        else:
+            item_text = "Would you like to use this item?"
+        pygame.draw.rect(screen, (200, 200, 200), [100, 300, 300, 80])
+        text = smallfont.render(item_text, True, (0,0,0))
+        screen.blit(text, (150, 315))
+
+        # yes and no buttons
+        pygame.draw.rect(screen, (100,100,100), [150, 350, 90, 25])
+        text = smallfont.render("Yes", True, (250, 250, 250))
+        screen.blit(text, (180, 355))
+        pygame.draw.rect(screen, (100,100,100), [270, 350, 90, 25])
+        text = smallfont.render("No", True, (250, 250, 250))
+        screen.blit(text, (300, 355))
+
+
     # Gets the mouse position
     mouse = pygame.mouse.get_pos()
 
@@ -248,7 +276,7 @@ while run:
             run = False
         if event.type == MOUSEBUTTONDOWN:
             print(mouse)
-            if (not show_inventory) and (currentRoom.roomType == "safe"):
+            if (not show_inventory) and (currentRoom.roomType == "safe"): # can't change rooms accidentally when inventory is open
                 # clicking on arrow
                 if 235 <= mouse[0] < 270 and 25 <= mouse[1] <= 70 and "North" in validMoves: # northArrow.rect.collidepoint(mouse)
                     sprites.ArrowSprite.Clicked(northArrow)
@@ -277,6 +305,127 @@ while run:
                             player.add_inventory(acquired_item)
                         print(f"Inventory: {player.inventory}")
             
+
+            # using items, and changing weapons
+            if show_inventory: 
+                # check which slot they clicked on if inventory is open
+                if 50 <= mouse[0] <= 100 and 50 <= mouse[1] <= 100: # first inventory slot clicked
+                    print("first slot clicked")
+                    if player.inventory[0][0] != None:
+                        show_prompt = True
+                        inventory_coords[0] = 0
+                        inventory_coords[1] = 0
+                        print("Type of this is " + str(type(player.inventory[0][0])))
+                        selected_item = player.inventory[0][0]
+                elif 110 <= mouse[0] <= 160 and 50 <= mouse[1] <= 100:
+                    print("second slot clicked")
+                    if player.inventory[0][1] != None:
+                        show_prompt = True
+                        inventory_coords[0] = 0
+                        inventory_coords[1] = 1
+                        print("Type of this is " + str(type(player.inventory[0][1])))
+                        selected_item = player.inventory[0][1]
+                elif 170 <= mouse[0] <= 220 and 50 <= mouse[1] <= 100:
+                    print("third slot clicked")
+                    if player.inventory[0][2] != None:
+                        show_prompt = True
+                        inventory_coords[0] = 0
+                        inventory_coords[1] = 2
+                        print("Type of this is " + str(type(player.inventory[0][2])))
+                        selected_item = player.inventory[0][2]
+                elif 230 <= mouse[0] <= 280 and 50 <= mouse[1] <= 100:
+                    print("fourth slot clicked")
+                    if player.inventory[0][3] != None:
+                        show_prompt = True
+                        inventory_coords[0] = 0
+                        inventory_coords[1] = 3
+                        print("Type of this is " + str(type(player.inventory[0][3])))
+                        selected_item = player.inventory[0][3]
+                elif 290 <= mouse[0] <= 340 and 50 <= mouse[1] <= 100:
+                    print("fifth slot clicked")
+                    if player.inventory[0][4] != None:
+                        show_prompt = True
+                        inventory_coords[0] = 0
+                        inventory_coords[1] = 4
+                        print("Type of this is " + str(type(player.inventory[0][4])))
+                        selected_item = player.inventory[0][4]
+                elif 50 <= mouse[0] <= 100 and 110 <= mouse[1] <= 160:
+                    print("sixth slot clicked")
+                    if player.inventory[1][0] != None:
+                        show_prompt = True
+                        inventory_coords[0] = 1
+                        inventory_coords[1] = 0
+                        print("Type of this is " + str(type(player.inventory[1][0])))
+                        selected_item = player.inventory[1][0]
+                elif 110 <= mouse[0] <= 160 and 110 <= mouse[1] <= 160:
+                    print("seventh slot clicked")
+                    if player.inventory[1][1] != None:
+                        show_prompt = True
+                        inventory_coords[0] = 1
+                        inventory_coords[1] = 1
+                        print("Type of this is " + str(type(player.inventory[1][1])))
+                        selected_item = player.inventory[1][1]
+                elif 170 <= mouse[0] <= 220 and 110 <= mouse[1] <= 160:
+                    print("eighth slot clicked")
+                    if player.inventory[1][2] != None:
+                        show_prompt = True
+                        inventory_coords[0] = 1
+                        inventory_coords[1] = 2
+                        print("Type of this is " + str(type(player.inventory[1][2])))
+                        selected_item = player.inventory[1][2]
+                elif 230 <= mouse[0] <= 280 and 110 <= mouse[1] <= 160:
+                    print("ninth slot clicked")
+                    if player.inventory[1][3] != None:
+                        show_prompt = True
+                        inventory_coords[0] = 1
+                        inventory_coords[1] = 3
+                        print("Type of this is " + str(type(player.inventory[1][3])))
+                        selected_item = player.inventory[1][3]
+                elif 290 <= mouse[0] <= 340 and 110 <= mouse[1] <= 160:
+                    print("tenth slot clicked")
+                    if player.inventory[1][4] != None:
+                        show_prompt = True
+                        inventory_coords[0] = 1
+                        inventory_coords[1] = 4
+                        print("Type of this is " + str(type(player.inventory[1][4])))
+                        selected_item = player.inventory[1][4]
+
+                # if not empty, then display based on what type of item it is. If weapon, then ask to switch. If not, then ask if they want to use that spell. 
+                # Box displayed of "Yes" and "No" buttons at bottom of it
+                if show_prompt:
+                    if 150 <= mouse[0] <= 240 and 350 <= mouse[1] <= 375: # clicked "yes" for use item
+                        print("yes clicked")
+                        show_prompt = False
+                        item_type = selected_item.type
+                        if item_type == "Axe" or item_type == "Rusty Sword" or item_type == "Bow":
+                            print("swap weapon")
+                            player.inventory[inventory_coords[0]][inventory_coords[1]] = player.equipped_item # place equipped weapon into inventory, then put inventory weapon selected to equipped
+                            player.equipped_item = selected_item
+                            player.damage = player.equipped_item.damage + player.base_damage # add the base damage of the player to the weapon's damage for total
+                            player.sprites_list[inventory_coords[0]][inventory_coords[1]] = player.equipped_sprite
+                            if item_type == "Axe":
+                                player.equipped_sprite = sprites.AxeSprite()
+                            elif item_type == "Rusty Sword":
+                                player.equipped_sprite = sprites.RustySwordSprite()
+                            else:
+                                player.equipped_sprite = sprites.BowSprite()
+                        else:
+                            print("spell selected")
+                            if item_type == "Healing":
+                                player.health += selected_item.effect 
+                                if player.health > player.max_health:
+                                    player.health = player.max_health # can't heal above max
+                                print("healing")
+                            elif item_type == "Attack Buff":
+                                print("attack buff")
+                            else: # defense buff
+                                print("defense buff")
+
+                    elif 270 <= mouse[0] <= 360 and 350 <= mouse[1] <= 375:
+                        print("no clicked")
+                        show_prompt = False
+                        selected_item = None
+
             if currentRoom.roomType == "safe":
                 # Clicked inventory button
                 if 210 <= mouse[0] <= 290 and 450 <= mouse[1] <= 475:
@@ -286,6 +435,7 @@ while run:
                 # Clicked inventory exit
                 if 456 <= mouse[0] <= 490 and 16 <= mouse[1] <= 53:
                     show_inventory = False
+                    show_prompt = False
             else:
                 # Clicked inventory button
                 if 375 <= mouse[0] <= 465 and 450 <= mouse[1] <= 475:
@@ -295,6 +445,7 @@ while run:
                 # Clicked inventory exit
                 if 456 <= mouse[0] <= 490 and 16 <= mouse[1] <= 53:
                     show_inventory = False
+                    show_prompt = False # exit out of item use prompt as well if exit inventory
 
                 # Clicked Attack button
                 if 200 <= mouse[0] <= 290 and 450 <= mouse[1] <= 475:
