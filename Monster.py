@@ -149,7 +149,7 @@ class Monkey(Monster):
 #Cool chad boss guy
 class Boss(Monster):
     def __init__(self):
-        self.image_name =  "SmallerFinalBoss.png"
+        self.image_name =  "MediumFinalBoss.png"
         self.image = sprites.MonsterSprite(self.image_name)
         Monster.__init__(self, "MediumFinalBoss.png", "Balanced")
         self.health = 40
