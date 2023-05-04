@@ -6,3 +6,6 @@ The player wakes up in a dimly lit cave with no memory of how they got there. Al
 Language: Python 3.9
 
 Turn on sound!
+
+## Demo Video
+Our recorded demonstration video can be watched through Clipchamp (https://clipchamp.com/watch/vV0SPlqLVVO) or Youtube (https://www.youtube.com/watch?v=FY0Z7713wSI). We each introduce ourselves, state our contributions, walk through the game with explanations of the patterns/technologies we used for each feature, then reflect on what we would do differently in the future and what we would like to add given more time.
