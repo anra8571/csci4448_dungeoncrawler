@@ -1,5 +1,6 @@
 import random
 
+# Strategy Pattern: Determines what type of battle style a monster has
 class attackStrat():
     attackProb = 0
     defenseProb = 0
@@ -11,8 +12,7 @@ class attackStrat():
     def getCrit():
         pass
 
-
-
+# Most likely to heal
 class Defensive(attackStrat):
     
     def __init__(self):
@@ -32,6 +32,7 @@ class Defensive(attackStrat):
         if choice < self.critPower:
             return True
         
+# Most likely to attack
 class Offensive(attackStrat):
     
     def __init__(self):
@@ -51,6 +52,7 @@ class Offensive(attackStrat):
         if choice < self.critPower:
             return True
 
+# Equal probability of attacking and defending
 class Balanced(attackStrat):
     def __init__(self):
         self.attackProb = 0.7

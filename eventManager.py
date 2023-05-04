@@ -1,5 +1,7 @@
 import os
 
+# Observer Pattern: Prints important events to log.txt
+# Publisher
 class ConcreteEventManager():
     def __init__(self):
         self.observers = []
@@ -20,6 +22,7 @@ class ConcreteEventManager():
     def update(self, note):
         self.notifyObservers(note)
 
+# Subscriber
 class Logger():
     def __init__(self):
         filepath = "log.txt"

@@ -9,6 +9,7 @@ slime_factory = MonsterFactory.SlimeFactory()
 boss_factory = MonsterFactory.BossFactory()
 monkey_factory = MonsterFactory.MonkeyFactory()
 
+# Each room is its own class and contains information about what is in it (monster vs. chest vs. opened chest), which adjacent rooms there are, etc.
 class Room():
 
     def __init__(self, coords, roomType): # for initial safe room, 
@@ -30,6 +31,7 @@ class Room():
                 pygame.mixer.music.load("My-Dark-Passenger.mp3")
                 pygame.mixer.music.play()  
 
+            # If the room is hostile, choose a randomly-generated monster to spawn
             num = random.randint(1, 4)
             if num == 1:
                 self.monster = goblin_factory.createMonster()     
@@ -91,6 +93,7 @@ class Room():
             print("room has been added")
         return map[new_coord] # this exists in the map already
 
+    # When the player defeats a monster, the room changes from hostile (red) to safe with loot (blue)
     def DefeatedRoom(self):
         self.roomType = "safe"
         self.chest = chest.ChestSprite("closed_chest.png") # init chest for this room

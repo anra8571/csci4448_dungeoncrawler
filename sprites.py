@@ -14,6 +14,8 @@ from pygame.locals import (
     MOUSEBUTTONDOWN,
 )
 
+# Each graphic needs its own class to display, so this file contains all the sprite initializations in one place
+
 class FireSprite(pygame.sprite.Sprite):
     def __init__(self):
         super(FireSprite, self).__init__()
@@ -44,9 +46,6 @@ class ArrowSprite(pygame.sprite.Sprite):
         self.direction = direction
         if direction == "North":
             char_path = os.path.join("graphics", "arrow_up.png")
-            #self.surf = pygame.image.load(char_path).convert()
-            #self.surf.set_colorkey((0, 0, 0), RLEACCEL)
-            #self.rect = self.surf.get_rect()
         elif direction == "East":
             char_path = os.path.join("graphics", "arrow_right.png")
         elif direction == "South":

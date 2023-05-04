@@ -23,6 +23,7 @@ class ChestSprite(pygame.sprite.Sprite):
         self.rect = self.surf.get_rect()
         self.opened = False
         
+    # When the chest is opened, change the graphic and add an item from the object pool to the player's inventory
     def open(self):
         if not self.opened: # can only loot once
             self.opened = True

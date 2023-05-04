@@ -24,6 +24,7 @@ class Item():
         self.attribute = in_attribute
         self.effect = in_effect
 
+# Inherits from Item
 class Spell(Item):
     def __init__(self):
         super().__init__("heal", random.randint(1, 10))
@@ -50,6 +51,7 @@ class DefenseBuff(Spell):
         self.effect = random.randint(2, 3)
         self.type = "Defense Buff"
 
+# Inherits from Item
 class Weapon(Item):
     def __init__(self):
         super().__init__("weapon", random.randint(2, 5))
@@ -75,6 +77,7 @@ class Bow(Weapon):
         self.damage = random.randint(1, 3)
         self.type = "Bow"
 
+# Object Pool Pattern
 class Pool:
     def __init__(self, size=10):
         self.objs = []
@@ -95,15 +98,19 @@ class Pool:
             else:
                 self.objs.append(Bow())
     
+    # Return a list of everything in the pool
     def return_items(self):
         return self.objs
     
+    # Take an object out of the pool
     def acquire(self):
         return self.objs.pop()
     
+    # Return an object to the pool
     def release(self, item):
         return self.objs.append(item)
     
+    # Print a list of everything in the pool
     def print_pool(self):
         obj_array = pool.return_items()
         for i in range(POOL_SIZE):
@@ -111,6 +118,7 @@ class Pool:
     
 pool = Pool(POOL_SIZE)
 
+# When item is passed in, return a string of its type
 def get_item_type(curr_item):
     if isinstance(curr_item, Healing):
         return "healing"
@@ -127,6 +135,7 @@ def get_item_type(curr_item):
     else:
         return "none"
     
+# Based on the type of item, return the appropriate graphic
 def return_sprite(curr_item):
     if get_item_type(curr_item) == "healing":
         return sprites.HealingSprite()
@@ -143,6 +152,7 @@ def return_sprite(curr_item):
     else:
         return "none"
     
+# Display the inventory on the screen
 def printInventory(screen, player_sprite, player, WIDTH, HEIGHT, font):
     pygame.draw.rect(screen, (100,100,100), [0, 0, 500, 500]) # background
     screen.blit(sprites.XSprite().surf, (WIDTH/10 * 9, HEIGHT/40))

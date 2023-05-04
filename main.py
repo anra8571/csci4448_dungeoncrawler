@@ -31,7 +31,8 @@ from pygame.locals import (
 import sys
 import os
 
-MONSTER_IMAGES = ["goblin.png", "funnyRockGuy.png"]
+# Skip to line 170 for main visualization code
+
 INVENTORY_WIDTH = 5
 INVENTORY_HEIGHT = 2
     
@@ -56,6 +57,7 @@ class Player():
         self.base_defense = 3
         self.buff_defense = 0
 
+    # Based on Magic the Gathering: The player's damage (plus any buffs or weapons) - the monster's defense = the damage the monster takes. The reverse is true when the monster attacks the player
     def CalcDamage(self):
         return self.base_damage + self.buff_damage + self.weapon_damage
     
@@ -66,6 +68,7 @@ class Player():
         if self.health <= 0:
             return False
         return True
+    
     def add_inventory(self, curr_item):
         # Maximum of 10 items in inventory - otherwise, the first one is automatically overwritten
         for i in range(INVENTORY_HEIGHT):
@@ -77,6 +80,7 @@ class Player():
         self.inventory[0][0] = curr_item
         self.sprites_list[0][0] = item.return_sprite(curr_item)
 
+# Draws the map with rooms updated according to what the player has explored so far
 def PrintMap(map, currentRoom, screen):
     pygame.draw.rect(screen, (0,0,0), [300, 40, 135, 135]) # mini-map backdrop
     for i in range(5):
@@ -162,14 +166,13 @@ map[(0,0)] = currentRoom
 
 numDefeated = 0 # number of enemies defeated
 
+# Run the visualization
 run = True
 while run:
+    # Title Screen
     if gameStart and not instructions:
         screen.blit(bg_tempStart, (0, 0)) # Start screen
         screen.blit(campfire_sprite.surf, (WIDTH/3 + 35, HEIGHT/4))
-        # pygame.draw.rect(screen, (100, 100, 100), [210, 450, 90, 25]) # Inventory
-        # text = smallfont.render("Start Game", True, (255, 255, 255))
-        # screen.blit(text, (224, 457))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -179,10 +182,11 @@ while run:
                 if 195 <= mouse[0] <= 320 and 395 <= mouse[1] <= 435:
                         print("clicked inventory")
                         gameStart = False
+    # End screens
     elif gameOver:
+        # Player lost
         if playerDead:
             screen.blit(bg_death, (0, 0))
-            events.update("You died!")
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
@@ -200,7 +204,7 @@ while run:
                 if event.type == MOUSEBUTTONDOWN:
                     print(mouse)
     else:
-
+        # Play the appropriate music for the room
         if curr_music != currentRoom.roomType:
             if curr_music == 'safe':
                 pygame.mixer.music.load("Hitman.mp3")
@@ -223,6 +227,7 @@ while run:
             pygame.draw.rect(screen, (100, 100, 100), [210, 450, 90, 25]) # Inventory
             text = smallfont.render("Inventory", True, (255, 255, 255))
             screen.blit(text, (224, 457))
+        # Draw a different background in the boss room
         else:
             if currentRoom.roomType == "boss":
                 screen.blit(bg_boss, (0,0))
@@ -231,6 +236,7 @@ while run:
                 screen.blit(bg_monster, (0,0)) # monster background
                 screen.blit((currentRoom.monster.image.surf), ((3 * WIDTH)/4, HEIGHT/2))
             
+            # Draw all the buttons
             pygame.draw.rect(screen, (100, 100, 100), [25, 450, 50, 25]) # Run away
             text = smallfont.render("Run", True, (255, 255, 255))
             screen.blit(text, (32, 457))
@@ -248,6 +254,7 @@ while run:
 
         validMoves = [] # get valid moves so we put arrows in the right spots
 
+        # Checks validity of all four movement directions
         if currentRoom.y > -2:
             screen.blit((northArrow.surf), (225, 20)) 
             validMoves.append("North")
@@ -490,6 +497,7 @@ while run:
                             print(f"End Attack: player health {player.health} and monster health {currentRoom.monster.health}")
                             if player.health <= 0:
                                 playerDead = True
+                                events.update("You died!")
                                 gameOver = True
 
                     #Clicked the run away button
@@ -499,7 +507,6 @@ while run:
                         print(chance)
                         if chance < 0.3:
                             events.update("run away successfully")
-                            #TODO lose an item in inventory
                             player.buff_damage = 0
                             player.buff_defense = 0 # spell buffs are removed upon room change 
                             newRoom = random.choice(validMoves)

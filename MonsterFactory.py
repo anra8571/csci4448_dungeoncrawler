@@ -4,6 +4,7 @@ from Monster import Cheeseman
 from Monster import Boss
 from Monster import Slime
 from Monster import Monkey
+
 class MonsterFactory:
 
     def createMonster(self):
