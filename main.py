@@ -269,9 +269,11 @@ while run:
         else:
             if currentRoom.roomType == "boss":
                 screen.blit(bg_boss, (0,0))
+                screen.blit((currentRoom.monster.image.surf), ((1 * WIDTH)/3, HEIGHT/3))
             else:
                 screen.blit(bg_monster, (0,0)) # monster background
-            screen.blit((currentRoom.monster.image.surf), ((3 * WIDTH)/4, HEIGHT/2))
+                screen.blit((currentRoom.monster.image.surf), ((3 * WIDTH)/4, HEIGHT/2))
+            
             pygame.draw.rect(screen, (100, 100, 100), [25, 450, 50, 25]) # Run away
             text = smallfont.render("Run", True, (255, 255, 255))
             screen.blit(text, (32, 457))
