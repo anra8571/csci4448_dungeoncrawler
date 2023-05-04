@@ -117,7 +117,7 @@ bg_tempStart_path = os.path.join("graphics", "start.png")
 campfire_sprite = sprites.FireSprite()
 bg_tempStart = pygame.image.load(bg_tempStart_path)
 bg_tempStart.set_colorkey((0, 0, 0), RLEACCEL)
-bg_death_path = os.path.join("graphics", "tempDeath.png")
+bg_death_path = os.path.join("graphics", "died.png")
 bg_death = pygame.image.load(bg_death_path)
 smallfont = pygame.font.SysFont('Corbel', 16)
 bigfont = pygame.font.SysFont('Corbel', 34)
@@ -182,6 +182,7 @@ while run:
     elif gameOver:
         if playerDead:
             screen.blit(bg_death, (0, 0))
+            events.update("You died!")
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
@@ -192,6 +193,7 @@ while run:
             screen.blit(bg_tempW, (0, 0))
             text = endfont.render("You Won!", True, (255, 255, 255))
             screen.blit(text, (190, HEIGHT/2 - 50))
+            events.update("You won!")
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
@@ -308,25 +310,25 @@ while run:
                         player.buff_defense = 0 # remove buffs on room change
                         sprites.ArrowSprite.Clicked(northArrow)
                         currentRoom = room.Room.SpawnRoom(map, currentRoom, (currentRoom.x, currentRoom.y), numDefeated, "north")
-                        print("current room coordinates are (" + str(currentRoom.x) + "," + str(currentRoom.y) + ")")
+                        events.update("current room coordinates are (" + str(currentRoom.x) + "," + str(currentRoom.y) + ")")
                     elif 430 <= mouse[0] < 475 and 205 <= mouse[1] <= 240 and "East" in validMoves:
                         player.buff_damage = 0
                         player.buff_defense = 0 # remove buffs on room change
                         sprites.ArrowSprite.Clicked(eastArrow)
                         currentRoom = room.Room.SpawnRoom(map, currentRoom, (currentRoom.x, currentRoom.y), numDefeated, "east")
-                        print("current room coordinates are (" + str(currentRoom.x) + "," + str(currentRoom.y) + ")")
+                        prinevents.updatet("current room coordinates are (" + str(currentRoom.x) + "," + str(currentRoom.y) + ")")
                     elif 235 <= mouse[0] < 270 and 400 <= mouse[1] <= 445 and "South" in validMoves:
                         player.buff_damage = 0
                         player.buff_defense = 0 # remove buffs on room change
                         sprites.ArrowSprite.Clicked(southArrow)
                         currentRoom = room.Room.SpawnRoom(map, currentRoom, (currentRoom.x, currentRoom.y), numDefeated, "south")
-                        print("current room coordinates are (" + str(currentRoom.x) + "," + str(currentRoom.y) + ")")
+                        events.update("current room coordinates are (" + str(currentRoom.x) + "," + str(currentRoom.y) + ")")
                     elif 30 <= mouse[0] < 75 and 205 <= mouse[1] <= 240 and "West" in validMoves:
                         player.buff_damage = 0
                         player.buff_defense = 0 # remove buffs on room change
                         sprites.ArrowSprite.Clicked(westArrow)
                         currentRoom = room.Room.SpawnRoom(map, currentRoom, (currentRoom.x, currentRoom.y), numDefeated, "west")
-                        print("current room coordinates are (" + str(currentRoom.x) + "," + str(currentRoom.y) + ")")
+                        events.update("current room coordinates are (" + str(currentRoom.x) + "," + str(currentRoom.y) + ")")
                 
                     # clicking on chest
                     if currentRoom.chest != None:
@@ -337,7 +339,7 @@ while run:
                             if acquired_item != None:
                                 player.add_inventory(acquired_item)
                                 events.acquireItem()
-                            print(f"Inventory: {player.inventory}")
+                            events.update(f"Inventory: {player.inventory}")
             
 
                 # using items, and changing weapons in the inventory
@@ -411,7 +413,7 @@ while run:
                             show_prompt = False
                             item_type = selected_item.type
                             if item_type == "Axe" or item_type == "Rusty Sword" or item_type == "Bow": # player is swapping weapons
-                                print("swap weapon")
+                                events.update("swap weapon")
                                 player.inventory[inventory_coords[0]][inventory_coords[1]] = player.equipped_item # place equipped weapon into inventory, then put inventory weapon selected to equipped
                                 player.equipped_item = selected_item
                                 player.weapon_damage = player.equipped_item.damage
@@ -462,12 +464,12 @@ while run:
 
                     # Clicked Attack button
                     if 200 <= mouse[0] <= 290 and 450 <= mouse[1] <= 475:
-                        print(f"Attack: player health {player.health} and monster health {currentRoom.monster.health}")
+                        events.update(f"Attack: player health {player.health} and monster health {currentRoom.monster.health}")
                         currentRoom.monster.takeDamage(player.CalcDamage())
                         if (currentRoom.monster.checkAlive()):
-                            print("The monster has died")
+                            events.update("The monster has died")
                             if currentRoom.roomType == 'boss':
-                                print("You've won")
+                                events.update("You've won")
                                 gameOver = True
 
                             else:
@@ -476,7 +478,7 @@ while run:
                         
                         else:
                             action = currentRoom.monster.pickAction()
-                            print(f"Monster Action: {action}")
+                            events.update(f"Monster Action: {action}")
                             if action[0] == "attack":
                                 if action[1] > player.CalcDefense():
                                     player.health -= action[1] - player.CalcDefense()
@@ -491,7 +493,7 @@ while run:
                         chance = random.random()
                         print(chance)
                         if chance < 0.3:
-                            print("run away successfully")
+                            events.update("run away successfully")
                             #TODO lose an item in inventory
                             player.buff_damage = 0
                             player.buff_defense = 0 # spell buffs are removed upon room change 
@@ -514,7 +516,7 @@ while run:
                                 currentRoom = room.Room.SpawnRoom(map, currentRoom, (currentRoom.x, currentRoom.y), numDefeated, "west")
                                 print("current room coordinates are (" + str(currentRoom.x) + "," + str(currentRoom.y) + ")")                
                         else:
-                            print("Did not run away")
+                            events.update("Did not run away")
                             action = currentRoom.monster.pickAction()
                             print(f"Monster Action: {action}")
                             if action[0] == "attack":

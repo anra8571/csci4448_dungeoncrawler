@@ -17,6 +17,9 @@ class ConcreteEventManager():
     def acquireItem(self):
         self.notifyObservers("Player acquired an item!\n")
 
+    def update(self, note):
+        self.notifyObservers(note)
+
 class Logger():
     def __init__(self):
         filepath = "log.txt"
