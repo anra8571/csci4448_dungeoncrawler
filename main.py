@@ -321,7 +321,7 @@ while run:
                         player.buff_defense = 0 # remove buffs on room change
                         sprites.ArrowSprite.Clicked(eastArrow)
                         currentRoom = room.Room.SpawnRoom(map, currentRoom, (currentRoom.x, currentRoom.y), numDefeated, "east")
-                        prinevents.updatet("current room coordinates are (" + str(currentRoom.x) + "," + str(currentRoom.y) + ")")
+                        events.update("current room coordinates are (" + str(currentRoom.x) + "," + str(currentRoom.y) + ")")
                     elif 235 <= mouse[0] < 270 and 400 <= mouse[1] <= 445 and "South" in validMoves:
                         player.buff_damage = 0
                         player.buff_defense = 0 # remove buffs on room change
